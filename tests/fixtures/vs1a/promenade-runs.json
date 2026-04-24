@@ -1,0 +1,33 @@
+{
+  "metadata": {
+    "sample_job": "The Promenade",
+    "data_layer": "sandbox",
+    "project_instance_id": "PRJ_PROMENADE_2026_001",
+    "framework_version": "v0.1-bootstrap",
+    "source_origin": "sandbox_fixture",
+    "note": "Validation fixture only. Not framework baseline estimating data."
+  },
+  "project": {
+    "project_instance_id": "PRJ_PROMENADE_2026_001",
+    "project_code": "PROMENADE",
+    "project_name": "The Promenade",
+    "mode": "quantity_only"
+  },
+  "source_document": {
+    "source_document_id": "DOC_PROMENADE_UTILITIES",
+    "file_name": "05_The_Promenade_Utilities_Water_Sanitary_C-50_to_C-52.pdf"
+  },
+  "sheets": [
+    { "sheet_number": "C-50", "sheet_title": "Utility Plan" },
+    { "sheet_number": "C-51", "sheet_title": "Sanitary Profiles" },
+    { "sheet_number": "C-52", "sheet_title": "Utility Easements" }
+  ],
+  "runs": [
+    { "run_id": "RUN-SSA-01", "source_sheet_id": "SHEET_C_51", "from_structure": "SSA1", "to_structure": "SSA2", "length_lf": 28, "diameter_in": 8, "material_type": "PVC_C900_DR18", "upstream_depth_ft": 12.8, "downstream_depth_ft": 10.07 },
+    { "run_id": "RUN-SSA-02", "source_sheet_id": "SHEET_C_51", "from_structure": "SSA2", "to_structure": "SSA2A", "length_lf": 110, "diameter_in": 8, "material_type": "PVC_C900_DR18", "upstream_depth_ft": 10.07, "downstream_depth_ft": 5.14 },
+    { "run_id": "RUN-SSA-05", "source_sheet_id": "SHEET_C_51", "from_structure": "SSA2", "to_structure": "SSA3", "length_lf": 205, "diameter_in": 8, "material_type": "PVC_C900_DR18", "upstream_depth_ft": 10.07, "downstream_depth_ft": 5.77 },
+    { "run_id": "RUN-SSB-01", "source_sheet_id": "SHEET_C_51", "from_structure": "SSB1", "to_structure": "SSB2", "length_lf": 142, "diameter_in": 8, "material_type": "PVC_C900_DR18", "upstream_depth_ft": 10.68, "downstream_depth_ft": 9.98 },
+    { "run_id": "RUN-SSB-02", "source_sheet_id": "SHEET_C_51", "from_structure": "SSB2", "to_structure": "SSB3", "length_lf": 78, "diameter_in": 8, "material_type": "PVC_C900_DR18", "upstream_depth_ft": 9.98, "downstream_depth_ft": 8.08 },
+    { "run_id": "RUN-SSB-03", "source_sheet_id": "SHEET_C_51", "from_structure": "SSB3", "to_structure": "SSB4", "length_lf": 159, "diameter_in": 8, "material_type": "PVC_C900_DR18", "upstream_depth_ft": 8.08, "downstream_depth_ft": 8.59 }
+  ]
+}
