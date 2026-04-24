@@ -8,6 +8,16 @@
     "skipLibCheck": true,
     "declaration": true,
     "sourceMap": true,
-    "outDir": "dist"
+    "outDir": "dist",
+    "baseUrl": ".",
+    "paths": {
+      "@v4/config": ["packages/config/src/index.ts"],
+      "@v4/domain": ["packages/domain/src/index.ts"],
+      "@v4/takeoff-engine": ["packages/takeoff-engine/src/index.ts"],
+      "@v4/production-rules": ["packages/production-rules/src/index.ts"],
+      "@v4/estimating-engine": ["packages/estimating-engine/src/index.ts"],
+      "@v4/vs1a": ["packages/vs1a/src/index.ts"],
+      "@v4/vendor-lines": ["packages/vendor-lines/src/index.ts"]
+    }
   }
 }
