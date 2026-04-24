@@ -1,0 +1,6 @@
+Ignore locally:
+node_modules
+dist
+coverage
+env files
+log files
