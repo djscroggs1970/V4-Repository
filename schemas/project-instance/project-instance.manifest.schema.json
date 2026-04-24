@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "V4 Project Instance Manifest",
+  "type": "object",
+  "required": [
+    "project_instance_id",
+    "framework_version",
+    "created_at",
+    "created_from_template_version",
+    "data_layer",
+    "drive_root_folder_name",
+    "expected_export_namespace"
+  ],
+  "properties": {
+    "project_instance_id": { "type": "string", "pattern": "^PRJ_[A-Z0-9_]+$" },
+    "framework_version": { "type": "string" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "created_from_template_version": { "type": "string" },
+    "data_layer": { "const": "project" },
+    "drive_root_folder_name": { "type": "string" },
+    "expected_export_namespace": { "type": "string" }
+  },
+  "additionalProperties": false
+}
