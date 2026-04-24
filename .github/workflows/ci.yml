@@ -1,6 +1,7 @@
 name: ci
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
   pull_request:
@@ -18,6 +19,8 @@ jobs:
         with:
           node-version: 20
       - run: pnpm install --frozen-lockfile=false
+      - run: pnpm typecheck
       - run: pnpm build
       - run: pnpm test
       - run: pnpm validate:rules
+      - run: pnpm sample:vs1a
