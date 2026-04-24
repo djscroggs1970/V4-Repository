@@ -1,0 +1,8 @@
+{
+  "id": "SANDBOX_ID",
+  "framework_version": "v0.1-bootstrap",
+  "created_at": "YYYY-MM-DDTHH:mm:ssZ",
+  "data_layer": "sandbox",
+  "folder_name": "SANDBOX_FOLDER",
+  "export_namespace": "SANDBOX_EXPORT"
+}
