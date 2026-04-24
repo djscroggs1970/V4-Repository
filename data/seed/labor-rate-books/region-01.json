@@ -1,0 +1,19 @@
+{
+  "metadata": {
+    "framework_version": "v0.1-bootstrap",
+    "region": "region_01",
+    "status": "placeholder_requires_validation",
+    "note": "Placeholder costs for executable pipeline only. Estimator review required before production use."
+  },
+  "crews": [
+    {
+      "crew_id": "CREW_PIPE_01",
+      "description": "Pipe installation crew placeholder",
+      "daily_cost": 3200,
+      "currency": "USD",
+      "data_layer": "framework",
+      "source_origin": "framework_seed",
+      "framework_version": "v0.1-bootstrap"
+    }
+  ]
+}
