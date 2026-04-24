@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "V4 Project Instance Airtable Schema",
+  "type": "object",
+  "required": ["required_boundary_fields", "tables"],
+  "properties": {
+    "required_boundary_fields": {
+      "type": "array",
+      "items": { "type": "string" },
+      "allOf": [
+        { "contains": { "const": "project_instance_id" } },
+        { "contains": { "const": "data_layer" } },
+        { "contains": { "const": "source_origin" } },
+        { "contains": { "const": "framework_version" } }
+      ]
+    },
+    "tables": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": true
+}
