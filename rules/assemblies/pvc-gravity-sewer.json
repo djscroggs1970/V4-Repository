@@ -1,0 +1,23 @@
+{
+  "metadata": {
+    "framework_version": "v0.1-bootstrap",
+    "work_type": "pvc_gravity_sewer",
+    "status": "placeholder_requires_validation"
+  },
+  "assemblies": [
+    {
+      "assembly_id": "ASM_PVC_GRAVITY_SEWER_8",
+      "assembly_version": "v0.1-placeholder",
+      "description": "8 inch PVC gravity sewer installation placeholder assembly",
+      "output_uom": "LF",
+      "components": [
+        { "component_type": "material", "ref_id": "MAT_PVC_C900_DR18_8", "quantity_per_output": 1, "uom": "LF" },
+        { "component_type": "labor", "ref_id": "CREW_PIPE_01", "quantity_per_output": 1, "uom": "CREW_DAY_BY_RATE" },
+        { "component_type": "equipment", "ref_id": "EQ_PIPE_CREW_01", "quantity_per_output": 1, "uom": "EQUIP_DAY_BY_RATE" }
+      ],
+      "data_layer": "framework",
+      "source_origin": "framework_seed",
+      "framework_version": "v0.1-bootstrap"
+    }
+  ]
+}
