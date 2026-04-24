@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "V4 Framework Airtable Schema",
+  "type": "object",
+  "required": ["tables", "required_boundary_fields"],
+  "properties": {
+    "required_boundary_fields": {
+      "type": "array",
+      "items": { "type": "string" },
+      "contains": { "const": "data_layer" }
+    },
+    "tables": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "additionalProperties": true
+}
