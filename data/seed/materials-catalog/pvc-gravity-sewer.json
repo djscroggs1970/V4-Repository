@@ -1,0 +1,29 @@
+{
+  "metadata": {
+    "framework_version": "v0.1-bootstrap",
+    "catalog": "pvc_gravity_sewer",
+    "status": "placeholder_requires_validation"
+  },
+  "materials": [
+    {
+      "material_id": "MAT_PVC_C900_DR18_8",
+      "description": "8 inch PVC C900 DR18 pipe",
+      "diameter_in": 8,
+      "material_type": "PVC_C900_DR18",
+      "uom": "LF",
+      "data_layer": "framework",
+      "source_origin": "framework_seed",
+      "framework_version": "v0.1-bootstrap"
+    },
+    {
+      "material_id": "MAT_DIP_P401_350_8",
+      "description": "8 inch DIP P401 Class 350 pipe",
+      "diameter_in": 8,
+      "material_type": "DIP_P401_CLASS_350",
+      "uom": "LF",
+      "data_layer": "framework",
+      "source_origin": "framework_seed",
+      "framework_version": "v0.1-bootstrap"
+    }
+  ]
+}
