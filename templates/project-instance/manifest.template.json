@@ -1,0 +1,9 @@
+{
+  "project_instance_id": "PRJ_PROJECTCODE_YYYY_SEQ",
+  "framework_version": "v0.1-bootstrap",
+  "created_at": "YYYY-MM-DDTHH:mm:ssZ",
+  "created_from_template_version": "v0.1-bootstrap",
+  "data_layer": "project",
+  "drive_root_folder_name": "PRJ_PROJECTCODE_YYYY_SEQ",
+  "expected_export_namespace": "PRJ_PROJECTCODE_YYYY_SEQ"
+}
