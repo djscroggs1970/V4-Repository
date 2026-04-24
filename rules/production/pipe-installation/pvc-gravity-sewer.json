@@ -1,0 +1,80 @@
+{
+  "metadata": {
+    "framework_version": "v0.1-bootstrap",
+    "work_type": "pvc_gravity_sewer",
+    "status": "placeholder_requires_validation",
+    "note": "Placeholder rates for executable pipeline only. Estimator review required before production use."
+  },
+  "rules": [
+    {
+      "rule_id": "PRR_PVC_8_A",
+      "rule_version": "v0.1-placeholder",
+      "work_type": "pvc_gravity_sewer",
+      "material_type": "PVC_C900_DR18",
+      "diameter_in": 8,
+      "depth_class": "A_0_5",
+      "production_uom": "LF_DAY",
+      "units_per_day": 250,
+      "validation_status": "placeholder",
+      "data_layer": "framework",
+      "source_origin": "framework_seed",
+      "framework_version": "v0.1-bootstrap"
+    },
+    {
+      "rule_id": "PRR_PVC_8_B",
+      "rule_version": "v0.1-placeholder",
+      "work_type": "pvc_gravity_sewer",
+      "material_type": "PVC_C900_DR18",
+      "diameter_in": 8,
+      "depth_class": "B_5_8",
+      "production_uom": "LF_DAY",
+      "units_per_day": 210,
+      "validation_status": "placeholder",
+      "data_layer": "framework",
+      "source_origin": "framework_seed",
+      "framework_version": "v0.1-bootstrap"
+    },
+    {
+      "rule_id": "PRR_PVC_8_C",
+      "rule_version": "v0.1-placeholder",
+      "work_type": "pvc_gravity_sewer",
+      "material_type": "PVC_C900_DR18",
+      "diameter_in": 8,
+      "depth_class": "C_8_10",
+      "production_uom": "LF_DAY",
+      "units_per_day": 180,
+      "validation_status": "placeholder",
+      "data_layer": "framework",
+      "source_origin": "framework_seed",
+      "framework_version": "v0.1-bootstrap"
+    },
+    {
+      "rule_id": "PRR_PVC_8_D",
+      "rule_version": "v0.1-placeholder",
+      "work_type": "pvc_gravity_sewer",
+      "material_type": "PVC_C900_DR18",
+      "diameter_in": 8,
+      "depth_class": "D_10_12",
+      "production_uom": "LF_DAY",
+      "units_per_day": 150,
+      "validation_status": "placeholder",
+      "data_layer": "framework",
+      "source_origin": "framework_seed",
+      "framework_version": "v0.1-bootstrap"
+    },
+    {
+      "rule_id": "PRR_PVC_8_E",
+      "rule_version": "v0.1-placeholder",
+      "work_type": "pvc_gravity_sewer",
+      "material_type": "PVC_C900_DR18",
+      "diameter_in": 8,
+      "depth_class": "E_OVER_12",
+      "production_uom": "LF_DAY",
+      "units_per_day": 120,
+      "validation_status": "placeholder",
+      "data_layer": "framework",
+      "source_origin": "framework_seed",
+      "framework_version": "v0.1-bootstrap"
+    }
+  ]
+}
