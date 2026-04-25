@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { QuantityExportObject } from "@v4/vs1a";
-import { buildCostBuildout, buildCostInputRegistry } from "./index.js";
+import { buildCostBuildout, buildCostInputRegistry, buildCostScenarioOutputManifest } from "./index.js";
 
 const QUANTITY_EXPORT: QuantityExportObject = {
   export_id: "QTY_EXPORT_SANDBOX_COST_001_20260425T030000000Z",
@@ -86,17 +86,33 @@ const PRODUCTION_RATES = [
   }
 ];
 
+function buildRegistry() {
+  return buildCostInputRegistry({
+    registry_id: "REGISTRY_COST_INPUTS_001",
+    registry_version: "2026.04.25",
+    material_quotes: MATERIAL_QUOTES,
+    labor_rates: LABOR_RATES,
+    equipment_rates: EQUIPMENT_RATES,
+    production_rates: PRODUCTION_RATES,
+    effective_at: "2026-04-25T03:15:00.000Z"
+  });
+}
+
+function buildScenario() {
+  return buildCostBuildout({
+    quantity_export: QUANTITY_EXPORT,
+    material_quotes: MATERIAL_QUOTES,
+    labor_rates: LABOR_RATES,
+    equipment_rates: EQUIPMENT_RATES,
+    production_rates: PRODUCTION_RATES,
+    scenario_id: "SCENARIO_COST_001",
+    generated_at: "2026-04-25T03:05:00.000Z"
+  });
+}
+
 describe("VS1B cost buildout", () => {
   it("builds cost lines from approved quantity export using controlled cost inputs", () => {
-    const result = buildCostBuildout({
-      quantity_export: QUANTITY_EXPORT,
-      material_quotes: MATERIAL_QUOTES,
-      labor_rates: LABOR_RATES,
-      equipment_rates: EQUIPMENT_RATES,
-      production_rates: PRODUCTION_RATES,
-      scenario_id: "SCENARIO_COST_001",
-      generated_at: "2026-04-25T03:05:00.000Z"
-    });
+    const result = buildScenario();
 
     expect(result.project_instance_id).toBe("SANDBOX_COST_001");
     expect(result.source_export_id).toBe(QUANTITY_EXPORT.export_id);
@@ -153,15 +169,7 @@ describe("VS1B cost buildout", () => {
 
 describe("VS1B cost input registry", () => {
   it("builds a validated registry with traceable material labor equipment and production inputs", () => {
-    const registry = buildCostInputRegistry({
-      registry_id: "REGISTRY_COST_INPUTS_001",
-      registry_version: "2026.04.25",
-      material_quotes: MATERIAL_QUOTES,
-      labor_rates: LABOR_RATES,
-      equipment_rates: EQUIPMENT_RATES,
-      production_rates: PRODUCTION_RATES,
-      effective_at: "2026-04-25T03:15:00.000Z"
-    });
+    const registry = buildRegistry();
 
     expect(registry.registry_id).toBe("REGISTRY_COST_INPUTS_001");
     expect(registry.registry_version).toBe("2026.04.25");
@@ -221,5 +229,59 @@ describe("VS1B cost input registry", () => {
         }
       ]
     })).toThrow("production_rate_equipment_rate_not_found");
+  });
+});
+
+describe("VS1B cost scenario output", () => {
+  it("builds a project-isolated cost scenario output manifest", () => {
+    const scenario = buildScenario();
+    const registry = buildRegistry();
+    const manifest = buildCostScenarioOutputManifest({
+      cost_buildout: scenario,
+      cost_input_registry: registry,
+      storage_root_uri: "drive://V4 Framework",
+      persisted_at: "2026-04-25T03:30:00.000Z"
+    });
+
+    expect(manifest.scenario_id).toBe("SCENARIO_COST_001");
+    expect(manifest.project_instance_id).toBe("SANDBOX_COST_001");
+    expect(manifest.source_export_id).toBe(QUANTITY_EXPORT.export_id);
+    expect(manifest.registry_id).toBe("REGISTRY_COST_INPUTS_001");
+    expect(manifest.registry_version).toBe("2026.04.25");
+    expect(manifest.storage_root_uri).toBe("drive://V4 Framework");
+    expect(manifest.storage_path).toBe("project-instances/SANDBOX_COST_001/cost-scenarios/SCENARIO_COST_001/SCENARIO_COST_001.json");
+    expect(manifest.content_type).toBe("application/json");
+    expect(manifest.line_count).toBe(2);
+    expect(manifest.total_cost).toBe(15160);
+    expect(manifest.trace_refs).toContain(QUANTITY_EXPORT.export_id);
+    expect(manifest.trace_refs).toContain("REGISTRY_COST_INPUTS_001");
+    expect(manifest.trace_refs).toContain("MAT-PVC-8-LF-001");
+    expect(manifest.trace_refs).toContain("PROD-PVC-8-A-001");
+  });
+
+  it("rejects scenario output without a storage root", () => {
+    expect(() => buildCostScenarioOutputManifest({
+      cost_buildout: buildScenario(),
+      cost_input_registry: buildRegistry(),
+      storage_root_uri: ""
+    })).toThrow("storage_root_uri_required");
+  });
+
+  it("rejects scenario output when a cost line input is not in the registry", () => {
+    const scenario = buildScenario();
+    const incompleteRegistry = buildCostInputRegistry({
+      registry_id: "REGISTRY_COST_INPUTS_INCOMPLETE",
+      registry_version: "2026.04.25",
+      material_quotes: MATERIAL_QUOTES,
+      labor_rates: LABOR_RATES,
+      equipment_rates: EQUIPMENT_RATES,
+      production_rates: [PRODUCTION_RATES[0]!]
+    });
+
+    expect(() => buildCostScenarioOutputManifest({
+      cost_buildout: scenario,
+      cost_input_registry: incompleteRegistry,
+      storage_root_uri: "drive://V4 Framework"
+    })).toThrow("cost_line_input_not_found_in_registry");
   });
 });
