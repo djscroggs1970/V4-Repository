@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applyTakeoffReviews, buildQuantityExport, buildQuantitySummary, buildSheetIndexCreationResult, buildTakeoffCandidateEntryResult, buildUploadRegistrationResult, buildVS1AResult, summarizeTakeoffReview } from "./index.js";
+import { applyTakeoffReviews, buildQuantityExport, buildQuantityExportPersistenceRecord, buildQuantitySummary, buildSheetIndexCreationResult, buildTakeoffCandidateEntryResult, buildUploadRegistrationResult, buildVS1AResult, summarizeTakeoffReview } from "./index.js";
 
 describe("VS1A quantity pipeline", () => {
   it("creates isolated project takeoff records", () => {
@@ -398,6 +398,89 @@ describe("VS1A quantity pipeline", () => {
       source_document_id: candidate.source_document.source_document_id,
       summary
     })).toThrow("quantity_summary_not_ready_for_export");
+  });
+
+  it("builds a project-isolated export persistence record", () => {
+    const candidate = buildTakeoffCandidateEntryResult({
+      project: {
+        project_instance_id: "PRJ_TEST_2026_013",
+        project_code: "TEST",
+        project_name: "Export Persistence Test"
+      },
+      uploaded_drawing: {
+        file_name: "utility-plan.pdf",
+        drive_file_id: "drive-file-013"
+      },
+      sheet_index: [
+        { sheet_number: "C-51" }
+      ],
+      runs: [
+        {
+          run_id: "RUN-001",
+          source_sheet_id: "SHEET_C_51",
+          from_structure: "MH-1",
+          to_structure: "MH-2",
+          length_lf: 100,
+          diameter_in: 8,
+          material_type: "PVC_C900_DR18",
+          upstream_depth_ft: 4,
+          downstream_depth_ft: 4
+        }
+      ]
+    });
+    const reviewed = applyTakeoffReviews(candidate.takeoff_items, [
+      { takeoff_item_id: "RUN-001_1", decision: "approved" }
+    ]);
+    const summary = buildQuantitySummary(reviewed);
+    const exported = buildQuantityExport({
+      project_instance_id: candidate.project.project_instance_id,
+      source_document_id: candidate.source_document.source_document_id,
+      summary,
+      generated_at: "2026-04-24T21:45:00.000Z"
+    });
+    const persistence = buildQuantityExportPersistenceRecord({
+      export_object: exported,
+      storage_root_uri: "drive://V4 Framework",
+      persisted_at: "2026-04-24T21:46:00.000Z"
+    });
+
+    expect(persistence.project_instance_id).toBe("PRJ_TEST_2026_013");
+    expect(persistence.export_id).toBe(exported.export_id);
+    expect(persistence.storage_root_uri).toBe("drive://V4 Framework");
+    expect(persistence.storage_path).toBe(`project-instances/${exported.project_instance_id}/exports/quantity-only/${exported.export_id}.json`);
+    expect(persistence.content_type).toBe("application/json");
+    expect(persistence.framework_version).toBe(exported.framework_version);
+    expect(persistence.source_document_id).toBe(exported.source_document_id);
+    expect(persistence.source_takeoff_item_ids).toEqual(["RUN-001_1"]);
+  });
+
+  it("rejects export persistence without a storage root", () => {
+    const readyExport = buildQuantityExport({
+      project_instance_id: "PRJ_TEST_2026_014",
+      source_document_id: "DOC_TEST",
+      generated_at: "2026-04-24T21:50:00.000Z",
+      summary: {
+        approved_count: 1,
+        excluded_count: 0,
+        next_required_action: "export_quantity_summary",
+        lines: [
+          {
+            project_instance_id: "PRJ_TEST_2026_014",
+            material_type: "PVC_C900_DR18",
+            diameter_in: 8,
+            depth_class: "A_0_5",
+            uom: "LF",
+            quantity: 100,
+            source_takeoff_item_ids: ["RUN-001_1"]
+          }
+        ]
+      }
+    });
+
+    expect(() => buildQuantityExportPersistenceRecord({
+      export_object: readyExport,
+      storage_root_uri: ""
+    })).toThrow("storage_root_uri_required");
   });
 
   it("requires notes for rejected or flagged takeoff reviews", () => {
