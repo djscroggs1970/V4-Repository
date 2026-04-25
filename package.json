@@ -10,7 +10,8 @@
     "validate:rules": "tsx scripts/validate-rules.ts",
     "sample:vs1a": "tsx scripts/run-vs1a-sample.ts",
     "sample:vs1a:upload": "tsx scripts/run-vs1a-upload-registration-sample.ts",
-    "sample:vs1a:sheets": "tsx scripts/run-vs1a-sheets-sample.ts"
+    "sample:vs1a:sheets": "tsx scripts/run-vs1a-sheets-sample.ts",
+    "sample:vs1a:takeoff": "tsx scripts/run-vs1a-takeoff-candidates-sample.ts"
   },
   "devDependencies": {
     "tsx": "^4.19.2",
