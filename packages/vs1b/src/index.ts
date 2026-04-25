@@ -1,6 +1,8 @@
 import { FRAMEWORK_VERSION } from "@v4/config";
 import type { DepthClass } from "@v4/domain";
 import type { QuantityExportObject, QuantitySummaryLine } from "@v4/vs1a";
+export { buildCostInputRegistry } from "./cost-input-registry.js";
+export type { CostInputRegistry, CostInputRegistryInput } from "./cost-input-registry.js";
 
 export interface MaterialQuoteInput {
   quote_id: string;
