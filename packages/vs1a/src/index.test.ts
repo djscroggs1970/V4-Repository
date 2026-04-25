@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applyTakeoffReviews, buildSheetIndexCreationResult, buildTakeoffCandidateEntryResult, buildUploadRegistrationResult, buildVS1AResult, summarizeTakeoffReview } from "./index.js";
+import { applyTakeoffReviews, buildQuantitySummary, buildSheetIndexCreationResult, buildTakeoffCandidateEntryResult, buildUploadRegistrationResult, buildVS1AResult, summarizeTakeoffReview } from "./index.js";
 
 describe("VS1A quantity pipeline", () => {
   it("creates isolated project takeoff records", () => {
@@ -163,6 +163,157 @@ describe("VS1A quantity pipeline", () => {
     expect(reviewed[0]?.review_status).toBe("approved");
     expect(summary.approved_count).toBe(1);
     expect(summary.next_required_action).toBe("create_quantity_summary");
+  });
+
+  it("summarizes only approved takeoff items and preserves source item IDs", () => {
+    const candidate = buildTakeoffCandidateEntryResult({
+      project: {
+        project_instance_id: "PRJ_TEST_2026_009",
+        project_code: "TEST",
+        project_name: "Quantity Summary Test"
+      },
+      uploaded_drawing: {
+        file_name: "utility-plan.pdf",
+        drive_file_id: "drive-file-009"
+      },
+      sheet_index: [
+        { sheet_number: "C-51" }
+      ],
+      runs: [
+        {
+          run_id: "RUN-001",
+          source_sheet_id: "SHEET_C_51",
+          from_structure: "MH-1",
+          to_structure: "MH-2",
+          length_lf: 100,
+          diameter_in: 8,
+          material_type: "PVC_C900_DR18",
+          upstream_depth_ft: 4,
+          downstream_depth_ft: 4
+        },
+        {
+          run_id: "RUN-002",
+          source_sheet_id: "SHEET_C_51",
+          from_structure: "MH-2",
+          to_structure: "MH-3",
+          length_lf: 50,
+          diameter_in: 8,
+          material_type: "PVC_C900_DR18",
+          upstream_depth_ft: 4,
+          downstream_depth_ft: 4
+        },
+        {
+          run_id: "RUN-003",
+          source_sheet_id: "SHEET_C_51",
+          from_structure: "MH-3",
+          to_structure: "MH-4",
+          length_lf: 25,
+          diameter_in: 8,
+          material_type: "PVC_C900_DR18",
+          upstream_depth_ft: 7,
+          downstream_depth_ft: 7
+        },
+        {
+          run_id: "RUN-004",
+          source_sheet_id: "SHEET_C_51",
+          from_structure: "MH-4",
+          to_structure: "MH-5",
+          length_lf: 10,
+          diameter_in: 10,
+          material_type: "PVC_C900_DR18",
+          upstream_depth_ft: 4,
+          downstream_depth_ft: 4
+        }
+      ]
+    });
+
+    const reviewed = applyTakeoffReviews(candidate.takeoff_items, [
+      { takeoff_item_id: "RUN-001_1", decision: "approved" },
+      { takeoff_item_id: "RUN-002_1", decision: "approved" },
+      { takeoff_item_id: "RUN-003_1", decision: "rejected", note: "Not in contract scope" },
+      { takeoff_item_id: "RUN-004_1", decision: "needs_review", note: "Confirm diameter" }
+    ]);
+    const summary = buildQuantitySummary(reviewed);
+
+    expect(summary.approved_count).toBe(2);
+    expect(summary.excluded_count).toBe(reviewed.length - 2);
+    expect(summary.lines).toHaveLength(1);
+    expect(summary.lines[0]).toMatchObject({
+      project_instance_id: "PRJ_TEST_2026_009",
+      material_type: "PVC_C900_DR18",
+      diameter_in: 8,
+      depth_class: "A_0_5",
+      uom: "LF",
+      quantity: 150
+    });
+    expect(summary.lines[0]?.source_takeoff_item_ids).toEqual(["RUN-001_1", "RUN-002_1"]);
+    expect(summary.next_required_action).toBe("resolve_takeoff_review_flags");
+  });
+
+  it("groups quantity summary by material diameter depth class and unit", () => {
+    const candidate = buildTakeoffCandidateEntryResult({
+      project: {
+        project_instance_id: "PRJ_TEST_2026_010",
+        project_code: "TEST",
+        project_name: "Quantity Grouping Test"
+      },
+      uploaded_drawing: {
+        file_name: "utility-plan.pdf",
+        drive_file_id: "drive-file-010"
+      },
+      sheet_index: [
+        { sheet_number: "C-51" }
+      ],
+      runs: [
+        {
+          run_id: "RUN-001",
+          source_sheet_id: "SHEET_C_51",
+          from_structure: "MH-1",
+          to_structure: "MH-2",
+          length_lf: 100,
+          diameter_in: 8,
+          material_type: "PVC_C900_DR18",
+          upstream_depth_ft: 4,
+          downstream_depth_ft: 4
+        },
+        {
+          run_id: "RUN-002",
+          source_sheet_id: "SHEET_C_51",
+          from_structure: "MH-2",
+          to_structure: "MH-3",
+          length_lf: 40,
+          diameter_in: 8,
+          material_type: "PVC_C900_DR18",
+          upstream_depth_ft: 7,
+          downstream_depth_ft: 7
+        },
+        {
+          run_id: "RUN-003",
+          source_sheet_id: "SHEET_C_51",
+          from_structure: "MH-3",
+          to_structure: "MH-4",
+          length_lf: 20,
+          diameter_in: 10,
+          material_type: "PVC_C900_DR18",
+          upstream_depth_ft: 4,
+          downstream_depth_ft: 4
+        }
+      ]
+    });
+
+    const reviewed = applyTakeoffReviews(candidate.takeoff_items, candidate.takeoff_items.map((item) => ({
+      takeoff_item_id: item.takeoff_item_id,
+      decision: "approved" as const
+    })));
+    const summary = buildQuantitySummary(reviewed);
+
+    expect(summary.lines).toHaveLength(3);
+    expect(summary.lines.map((line) => `${line.material_type}|${line.diameter_in}|${line.depth_class}|${line.uom}`)).toEqual([
+      "PVC_C900_DR18|8|A_0_5|LF",
+      "PVC_C900_DR18|8|B_5_8|LF",
+      "PVC_C900_DR18|10|A_0_5|LF"
+    ]);
+    expect(summary.next_required_action).toBe("export_quantity_summary");
   });
 
   it("requires notes for rejected or flagged takeoff reviews", () => {
