@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildSheetIndexCreationResult, buildTakeoffCandidateEntryResult, buildUploadRegistrationResult, buildVS1AResult } from "./index.js";
+import { applyTakeoffReviews, buildSheetIndexCreationResult, buildTakeoffCandidateEntryResult, buildUploadRegistrationResult, buildVS1AResult, summarizeTakeoffReview } from "./index.js";
 
 describe("VS1A quantity pipeline", () => {
   it("creates isolated project takeoff records", () => {
@@ -126,6 +126,75 @@ describe("VS1A quantity pipeline", () => {
     expect(result.takeoff_items.every((item) => item.source_sheet_id === "SHEET_C_51")).toBe(true);
     expect(result.takeoff_items.every((item) => item.review_status === "pending")).toBe(true);
     expect(result.next_required_action).toBe("review_takeoff_candidates");
+  });
+
+  it("applies takeoff review decisions and summarizes next action", () => {
+    const candidate = buildTakeoffCandidateEntryResult({
+      project: {
+        project_instance_id: "PRJ_TEST_2026_007",
+        project_code: "TEST",
+        project_name: "Takeoff Review Test"
+      },
+      uploaded_drawing: {
+        file_name: "utility-plan.pdf",
+        drive_file_id: "drive-file-007"
+      },
+      sheet_index: [
+        { sheet_number: "C-51" }
+      ],
+      runs: [
+        {
+          run_id: "RUN-001",
+          source_sheet_id: "SHEET_C_51",
+          from_structure: "MH-1",
+          to_structure: "MH-2",
+          length_lf: 100,
+          diameter_in: 8,
+          material_type: "PVC_C900_DR18"
+        }
+      ]
+    });
+
+    const reviewed = applyTakeoffReviews(candidate.takeoff_items, [
+      { takeoff_item_id: candidate.takeoff_items[0]!.takeoff_item_id, decision: "approved", reviewer: "estimator" }
+    ]);
+    const summary = summarizeTakeoffReview(reviewed);
+
+    expect(reviewed[0]?.review_status).toBe("approved");
+    expect(summary.approved_count).toBe(1);
+    expect(summary.next_required_action).toBe("create_quantity_summary");
+  });
+
+  it("requires notes for rejected or flagged takeoff reviews", () => {
+    const candidate = buildTakeoffCandidateEntryResult({
+      project: {
+        project_instance_id: "PRJ_TEST_2026_008",
+        project_code: "TEST",
+        project_name: "Takeoff Review Note Test"
+      },
+      uploaded_drawing: {
+        file_name: "utility-plan.pdf",
+        drive_file_id: "drive-file-008"
+      },
+      sheet_index: [
+        { sheet_number: "C-51" }
+      ],
+      runs: [
+        {
+          run_id: "RUN-001",
+          source_sheet_id: "SHEET_C_51",
+          from_structure: "MH-1",
+          to_structure: "MH-2",
+          length_lf: 100,
+          diameter_in: 8,
+          material_type: "PVC_C900_DR18"
+        }
+      ]
+    });
+
+    expect(() => applyTakeoffReviews(candidate.takeoff_items, [
+      { takeoff_item_id: candidate.takeoff_items[0]!.takeoff_item_id, decision: "rejected" }
+    ])).toThrow("review_note_required");
   });
 
   it("rejects takeoff candidates that reference unknown sheets", () => {
