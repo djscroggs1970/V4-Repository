@@ -7,6 +7,8 @@ export { buildQuantitySummary } from "./summary.js";
 export type { QuantitySummaryLine, QuantitySummaryResult } from "./summary.js";
 export { buildQuantityExport } from "./quantity-export.js";
 export type { QuantityExportInput, QuantityExportObject } from "./quantity-export.js";
+export { buildQuantityExportPersistenceRecord } from "./export-persistence.js";
+export type { QuantityExportPersistenceInput, QuantityExportPersistenceRecord } from "./export-persistence.js";
 
 export interface ProjectManifestInput {
   project_instance_id: string;
