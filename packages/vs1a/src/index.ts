@@ -48,6 +48,15 @@ export interface SheetIndexCreationResult {
   next_required_action: "create_takeoff_candidates";
 }
 
+export interface TakeoffCandidateEntryResult {
+  project: ProjectInstance;
+  source_document: SourceDocument;
+  drawing_sheets: DrawingSheet[];
+  takeoff_items: TakeoffItem[];
+  review_status: "takeoff_candidates_created_pending_review";
+  next_required_action: "review_takeoff_candidates";
+}
+
 export interface SanitaryRunInput {
   run_id: string;
   source_sheet_id: string;
@@ -139,6 +148,27 @@ export function buildSheetIndexCreationResult(input: {
   };
 }
 
+export function buildTakeoffCandidateEntryResult(input: {
+  project: ProjectManifestInput;
+  uploaded_drawing: UploadedDrawingInput;
+  sheet_index: SheetIndexEntryInput[];
+  runs: SanitaryRunInput[];
+}): TakeoffCandidateEntryResult {
+  const project = createProjectInstance(input.project);
+  const source_document = registerUploadedDrawing(project, input.uploaded_drawing);
+  const drawing_sheets = createSheetIndex(project, source_document.source_document_id, input.sheet_index);
+  assertRunsReferenceKnownSheets(input.runs, drawing_sheets);
+  const takeoff_items = sanitaryRunsToTakeoffItems(project, input.runs);
+  return {
+    project,
+    source_document,
+    drawing_sheets,
+    takeoff_items,
+    review_status: "takeoff_candidates_created_pending_review",
+    next_required_action: "review_takeoff_candidates"
+  };
+}
+
 export function createDrawingSheet(project: ProjectInstance, source_document_id: string, sheet_number: string, sheet_title?: string, discipline = "utilities"): DrawingSheet {
   const normalizedSheetNumber = normalizeSheetNumber(sheet_number);
   return {
@@ -160,6 +190,7 @@ export function createSheetIndex(project: ProjectInstance, source_document_id: s
 }
 
 export function sanitaryRunsToTakeoffItems(project: ProjectInstance, runs: SanitaryRunInput[]): TakeoffItem[] {
+  assertSanitaryRuns(runs);
   return runs.flatMap((run) => {
     const allocations = hasDepths(run)
       ? allocateRunToDepthBuckets({
@@ -198,6 +229,7 @@ export function buildVS1AResult(input: {
   const project = createProjectInstance(input.project);
   const source_document = registerDrawingDocument(project, input.source_document);
   const drawing_sheets = input.sheets.map((sheet) => createDrawingSheet(project, source_document.source_document_id, sheet.sheet_number, sheet.sheet_title));
+  assertRunsReferenceKnownSheets(input.runs, drawing_sheets);
   const takeoff_items = sanitaryRunsToTakeoffItems(project, input.runs);
   return { project, source_document, drawing_sheets, takeoff_items };
 }
@@ -238,6 +270,32 @@ function assertSheetIndex(sheets: SheetIndexEntryInput[]): void {
       throw new Error("duplicate_sheet_number");
     }
     seen.add(normalized);
+  }
+}
+
+function assertSanitaryRuns(runs: SanitaryRunInput[]): void {
+  if (runs.length === 0) {
+    throw new Error("takeoff_candidates_required");
+  }
+
+  const seen = new Set<string>();
+  for (const run of runs) {
+    if (!run.run_id) throw new Error("run_id_required");
+    if (seen.has(run.run_id)) throw new Error("duplicate_run_id");
+    if (!run.source_sheet_id) throw new Error("source_sheet_id_required");
+    if (run.length_lf <= 0) throw new Error("run_length_must_be_positive");
+    if (run.diameter_in <= 0) throw new Error("diameter_must_be_positive");
+    if (!run.material_type) throw new Error("material_type_required");
+    seen.add(run.run_id);
+  }
+}
+
+function assertRunsReferenceKnownSheets(runs: SanitaryRunInput[], sheets: DrawingSheet[]): void {
+  const sheetIds = new Set(sheets.map((sheet) => sheet.drawing_sheet_id));
+  for (const run of runs) {
+    if (!sheetIds.has(run.source_sheet_id)) {
+      throw new Error("run_source_sheet_not_found");
+    }
   }
 }
 
