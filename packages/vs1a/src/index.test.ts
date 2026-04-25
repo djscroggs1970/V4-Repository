@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildUploadRegistrationResult, buildVS1AResult } from "./index.js";
+import { buildSheetIndexCreationResult, buildUploadRegistrationResult, buildVS1AResult } from "./index.js";
 
 describe("VS1A quantity pipeline", () => {
   it("creates isolated project takeoff records", () => {
@@ -61,6 +61,50 @@ describe("VS1A quantity pipeline", () => {
     expect(result.drawing_sheets).toHaveLength(0);
     expect(result.takeoff_items).toHaveLength(0);
     expect(result.next_required_action).toBe("create_sheet_index");
+  });
+
+  it("creates controlled sheet index after upload registration", () => {
+    const result = buildSheetIndexCreationResult({
+      project: {
+        project_instance_id: "PRJ_TEST_2026_003",
+        project_code: "TEST",
+        project_name: "Sheet Index Test"
+      },
+      uploaded_drawing: {
+        file_name: "utility-plan.pdf",
+        drive_file_id: "drive-file-003",
+        mime_type: "application/pdf"
+      },
+      sheet_index: [
+        { sheet_number: "C-50", sheet_title: "Utility Plan", discipline: "utilities" },
+        { sheet_number: "C-51", sheet_title: "Sanitary Profiles", discipline: "utilities" }
+      ]
+    });
+
+    expect(result.project.project_instance_id).toBe("PRJ_TEST_2026_003");
+    expect(result.drawing_sheets).toHaveLength(2);
+    expect(result.drawing_sheets[0]?.source_document_id).toBe(result.source_document.source_document_id);
+    expect(result.drawing_sheets.every((sheet) => sheet.project_instance_id === "PRJ_TEST_2026_003")).toBe(true);
+    expect(result.takeoff_items).toHaveLength(0);
+    expect(result.next_required_action).toBe("create_takeoff_candidates");
+  });
+
+  it("rejects duplicate sheet numbers", () => {
+    expect(() => buildSheetIndexCreationResult({
+      project: {
+        project_instance_id: "PRJ_TEST_2026_004",
+        project_code: "TEST",
+        project_name: "Duplicate Sheet Test"
+      },
+      uploaded_drawing: {
+        file_name: "utility-plan.pdf",
+        drive_file_id: "drive-file-004"
+      },
+      sheet_index: [
+        { sheet_number: "C-50" },
+        { sheet_number: "C 50" }
+      ]
+    })).toThrow("duplicate_sheet_number");
   });
 
   it("rejects non-pdf uploads", () => {
