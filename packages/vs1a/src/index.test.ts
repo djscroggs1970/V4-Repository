@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildVS1AResult } from "./index.js";
+import { buildUploadRegistrationResult, buildVS1AResult } from "./index.js";
 
 describe("VS1A quantity pipeline", () => {
   it("creates isolated project takeoff records", () => {
@@ -38,5 +38,42 @@ describe("VS1A quantity pipeline", () => {
     expect(result.takeoff_items.length).toBeGreaterThan(0);
     expect(result.takeoff_items.every((item) => item.project_instance_id === "PRJ_PROMENADE_2026_001")).toBe(true);
     expect(result.takeoff_items.every((item) => item.data_layer === "project")).toBe(true);
+  });
+
+  it("registers uploaded drawing without extracting sheets or runs", () => {
+    const result = buildUploadRegistrationResult({
+      project: {
+        project_instance_id: "PRJ_TEST_2026_001",
+        project_code: "TEST",
+        project_name: "Upload Registration Test"
+      },
+      uploaded_drawing: {
+        file_name: "utility-plan.pdf",
+        drive_file_id: "drive-file-001",
+        mime_type: "application/pdf"
+      }
+    });
+
+    expect(result.project.project_instance_id).toBe("PRJ_TEST_2026_001");
+    expect(result.source_document.file_name).toBe("utility-plan.pdf");
+    expect(result.source_document.drive_file_id).toBe("drive-file-001");
+    expect(result.source_document.processing_status).toBe("new");
+    expect(result.drawing_sheets).toHaveLength(0);
+    expect(result.takeoff_items).toHaveLength(0);
+    expect(result.next_required_action).toBe("create_sheet_index");
+  });
+
+  it("rejects non-pdf uploads", () => {
+    expect(() => buildUploadRegistrationResult({
+      project: {
+        project_instance_id: "PRJ_TEST_2026_002",
+        project_code: "TEST",
+        project_name: "Bad Upload Test"
+      },
+      uploaded_drawing: {
+        file_name: "utility-plan.xlsx",
+        drive_file_id: "drive-file-002"
+      }
+    })).toThrow("uploaded_drawing_must_be_pdf");
   });
 });
