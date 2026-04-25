@@ -8,7 +8,8 @@
     "test": "pnpm -r test",
     "typecheck": "pnpm -r typecheck",
     "validate:rules": "tsx scripts/validate-rules.ts",
-    "sample:vs1a": "tsx scripts/run-vs1a-sample.ts"
+    "sample:vs1a": "tsx scripts/run-vs1a-sample.ts",
+    "sample:vs1a:upload": "tsx scripts/run-vs1a-upload-registration-sample.ts"
   },
   "devDependencies": {
     "tsx": "^4.19.2",
