@@ -1,8 +1,8 @@
 # V4 Current State
 
 Status: active restart snapshot  
-Last updated: 2026-04-24  
-Current verified version: `v0.1-vs1a-quantity-export-ci-pass`
+Last updated: 2026-04-25  
+Current verified version: `v0.1-vs1b-cost-scenario-output-ci-pass`
 
 ## Purpose
 
@@ -15,10 +15,11 @@ This document is the compact restart point for future V4 Civil Estimating Platfo
 - Google Drive root: `V4 Framework`
 - ClickUp location: `V4 Framework`
 - Continuity guide: `docs/continuity/source-of-truth.md`
+- Production-rate policy: `docs/governance/production-rate-source-policy.md`
 
 ## Current verified VS1A chain
 
-VS1A is verified through quantity-only export.
+VS1A is verified through sandbox plan harvest and quantity export persistence.
 
 1. Upload registration
 2. Sheet index creation
@@ -26,26 +27,52 @@ VS1A is verified through quantity-only export.
 4. Takeoff review
 5. Quantity summary
 6. Quantity export
+7. Quantity export persistence manifest
+8. Sanitized controlled real-plan-style validation
+9. Plan harvest sandbox with review/export gates
 
-## Current implementation package
+## Current verified VS1B chain
 
-Primary package:
+VS1B is verified through cost scenario output manifest.
+
+1. Initial cost buildout from approved quantity exports
+2. Cost input registry
+3. Production-rate source policy
+4. Cost scenario output manifest
+
+## Current implementation packages
+
+Primary packages:
 
 ```text
 packages/vs1a
+packages/vs1b
 ```
 
-Key files:
+Key VS1A files:
 
 ```text
 packages/vs1a/src/index.ts
 packages/vs1a/src/review.ts
 packages/vs1a/src/summary.ts
 packages/vs1a/src/quantity-export.ts
+packages/vs1a/src/export-persistence.ts
+packages/vs1a/src/plan-harvest.ts
 packages/vs1a/src/index.test.ts
+packages/vs1a/src/plan-harvest.test.ts
+packages/vs1a/src/promenade-plan-validation.test.ts
 ```
 
-## Verified behavior
+Key VS1B files:
+
+```text
+packages/vs1b/src/index.ts
+packages/vs1b/src/cost-input-registry.ts
+packages/vs1b/src/cost-scenario-output.ts
+packages/vs1b/src/index.test.ts
+```
+
+## Verified VS1A behavior
 
 The current VS1A pipeline can:
 
@@ -53,6 +80,7 @@ The current VS1A pipeline can:
 - register an uploaded PDF drawing using metadata
 - create controlled drawing sheet records
 - create structured/manual sanitary takeoff candidates
+- create provisional sandbox harvest candidates with provenance and confidence
 - validate source sheet references
 - split pipe quantities by depth class when depths are provided
 - apply review decisions to takeoff candidates
@@ -63,6 +91,25 @@ The current VS1A pipeline can:
 - preserve source takeoff item IDs
 - create a quantity-only export object
 - block export when review items are still open
+- create a project-isolated quantity export persistence manifest
+
+## Verified VS1B behavior
+
+The current VS1B pipeline can:
+
+- consume approved quantity-only exports
+- apply controlled material quotes
+- apply controlled labor rates
+- apply controlled equipment rates
+- apply validated production rates
+- reject placeholder production rates
+- create traceable cost buildout lines and totals
+- validate cost input registries
+- enforce unique registry IDs
+- enforce production-rate links to known crew and equipment records
+- preserve quantity export, takeoff item, quote, labor, equipment, production-rate, and registry traceability
+- create a project-isolated cost scenario output manifest
+- block scenario output when cost line inputs are not present in the validated registry
 
 ## Current guardrails
 
@@ -72,6 +119,8 @@ The current VS1A pipeline can:
 - Every project/job instance must carry its own `project_instance_id`.
 - Framework, sandbox, and project data must remain separated.
 - Only approved reviewed takeoff items can feed quantity summary or export.
+- Cost scenarios may consume only approved quantity exports and validated cost input registries.
+- Placeholder production rates may exist in tests but must be blocked from estimate output.
 - CI must pass before a slice is marked verified.
 
 ## Current CI command set
@@ -88,6 +137,8 @@ pnpm sample:vs1a
 pnpm sample:vs1a:upload
 ```
 
+CI workflow is currently set to Node 24 and clean action runtime.
+
 Some standalone sample scripts may exist outside CI and should be treated as supplemental checks unless explicitly wired into the workflow.
 
 ## Next logical slice
@@ -95,18 +146,18 @@ Some standalone sample scripts may exist outside CI and should be treated as sup
 Recommended next slice:
 
 ```text
-VS1A Continuity State CI Verification
+VS1B Cost Scenario Persistence
 ```
 
-Goal: confirm this continuity state document exists and keep Airtable aligned with the latest verified restart snapshot.
+Goal: persist cost scenario outputs with project-instance isolation, source quantity export reference, cost input registry version, framework version, totals, line traceability, and storage path.
 
 After that, the likely next product slice is:
 
 ```text
-VS1A Export Persistence
+Estimate Package Output
 ```
 
-Goal: persist the quantity export object to the designated storage path with project-instance isolation and traceability.
+Goal: assemble approved quantity export, cost scenario output, trace manifest, and review status into a controlled estimate package suitable for human review.
 
 ## New session boot instruction
 
@@ -115,7 +166,7 @@ Start future sessions with:
 ```text
 This is a V4 Civil Estimating Platform session.
 Use GitHub `djscroggs1970/V4-Repository`, Airtable `V4 Base`, Drive `V4 Framework`, and ClickUp `V4 Framework` as the external sources of truth.
-Read `docs/continuity/source-of-truth.md` and `docs/continuity/current-state.md` before continuing.
+Read `docs/continuity/source-of-truth.md`, `docs/continuity/current-state.md`, and `docs/governance/production-rate-source-policy.md` before continuing.
 Current goal: [one sentence].
 Do not rely on prior job data unless explicitly provided.
 Maintain job-instance isolation and no-bleed/no-drift rules.
