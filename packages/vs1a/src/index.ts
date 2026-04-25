@@ -3,6 +3,8 @@ import type { DepthClass, DrawingSheet, ProjectInstance, SourceDocument, Takeoff
 import { allocateRunToDepthBuckets } from "@v4/takeoff-engine";
 export { applyTakeoffReviews, summarizeTakeoffReview } from "./review.js";
 export type { TakeoffDecision, TakeoffReviewInput, TakeoffReviewSummary } from "./review.js";
+export { buildQuantitySummary } from "./summary.js";
+export type { QuantitySummaryLine, QuantitySummaryResult } from "./summary.js";
 
 export interface ProjectManifestInput {
   project_instance_id: string;
