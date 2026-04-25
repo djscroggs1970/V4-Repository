@@ -2,7 +2,7 @@
 
 Status: active restart snapshot  
 Last updated: 2026-04-25  
-Current verified version: `v0.1-vs1b-cost-scenario-output-ci-pass`
+Current verified version: `v0.1-estimate-package-output-ci-pass`
 
 ## Purpose
 
@@ -33,12 +33,14 @@ VS1A is verified through sandbox plan harvest and quantity export persistence.
 
 ## Current verified VS1B chain
 
-VS1B is verified through cost scenario output manifest.
+VS1B is verified through estimate package output.
 
 1. Initial cost buildout from approved quantity exports
 2. Cost input registry
 3. Production-rate source policy
 4. Cost scenario output manifest
+5. Cost scenario persistence record
+6. Estimate package output for controlled human review
 
 ## Current implementation packages
 
@@ -69,6 +71,8 @@ Key VS1B files:
 packages/vs1b/src/index.ts
 packages/vs1b/src/cost-input-registry.ts
 packages/vs1b/src/cost-scenario-output.ts
+packages/vs1b/src/cost-scenario-persistence.ts
+packages/vs1b/src/estimate-package.ts
 packages/vs1b/src/index.test.ts
 ```
 
@@ -109,7 +113,10 @@ The current VS1B pipeline can:
 - enforce production-rate links to known crew and equipment records
 - preserve quantity export, takeoff item, quote, labor, equipment, production-rate, and registry traceability
 - create a project-isolated cost scenario output manifest
+- persist cost scenario output records with storage path and trace references
 - block scenario output when cost line inputs are not present in the validated registry
+- assemble quantity export, quantity persistence, cost buildout, cost scenario output, cost scenario persistence, review status, storage paths, and trace manifest into a controlled human-review estimate package
+- reject estimate packages with project-instance mismatches or missing takeoff trace coverage
 
 ## Current guardrails
 
@@ -121,6 +128,7 @@ The current VS1B pipeline can:
 - Only approved reviewed takeoff items can feed quantity summary or export.
 - Cost scenarios may consume only approved quantity exports and validated cost input registries.
 - Placeholder production rates may exist in tests but must be blocked from estimate output.
+- Estimate packages are for controlled human review, not autonomous bid submission.
 - CI must pass before a slice is marked verified.
 
 ## Current CI command set
@@ -146,18 +154,18 @@ Some standalone sample scripts may exist outside CI and should be treated as sup
 Recommended next slice:
 
 ```text
-VS1B Cost Scenario Persistence
+Estimate Package Persistence
 ```
 
-Goal: persist cost scenario outputs with project-instance isolation, source quantity export reference, cost input registry version, framework version, totals, line traceability, and storage path.
+Goal: persist the estimate package output with project-instance isolation, package ID, review status, source quantity export, cost scenario output, persistence records, trace manifest, and storage path.
 
 After that, the likely next product slice is:
 
 ```text
-Estimate Package Output
+Human Review Workflow
 ```
 
-Goal: assemble approved quantity export, cost scenario output, trace manifest, and review status into a controlled estimate package suitable for human review.
+Goal: define approve/reject/needs-review workflow for estimate packages before any bid-grade or client-facing output can be released.
 
 ## New session boot instruction
 
