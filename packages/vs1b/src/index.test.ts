@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { QuantityExportObject } from "@v4/vs1a";
-import { buildCostBuildout, buildCostInputRegistry, buildCostScenarioOutputManifest } from "./index.js";
+import { buildCostBuildout, buildCostInputRegistry, buildCostScenarioOutputManifest, buildCostScenarioPersistenceRecord } from "./index.js";
 
 const QUANTITY_EXPORT: QuantityExportObject = {
   export_id: "QTY_EXPORT_SANDBOX_COST_001_20260425T030000000Z",
@@ -107,6 +107,15 @@ function buildScenario() {
     production_rates: PRODUCTION_RATES,
     scenario_id: "SCENARIO_COST_001",
     generated_at: "2026-04-25T03:05:00.000Z"
+  });
+}
+
+function buildScenarioManifest() {
+  return buildCostScenarioOutputManifest({
+    cost_buildout: buildScenario(),
+    cost_input_registry: buildRegistry(),
+    storage_root_uri: "drive://V4 Framework",
+    persisted_at: "2026-04-25T03:30:00.000Z"
   });
 }
 
@@ -234,14 +243,7 @@ describe("VS1B cost input registry", () => {
 
 describe("VS1B cost scenario output", () => {
   it("builds a project-isolated cost scenario output manifest", () => {
-    const scenario = buildScenario();
-    const registry = buildRegistry();
-    const manifest = buildCostScenarioOutputManifest({
-      cost_buildout: scenario,
-      cost_input_registry: registry,
-      storage_root_uri: "drive://V4 Framework",
-      persisted_at: "2026-04-25T03:30:00.000Z"
-    });
+    const manifest = buildScenarioManifest();
 
     expect(manifest.scenario_id).toBe("SCENARIO_COST_001");
     expect(manifest.project_instance_id).toBe("SANDBOX_COST_001");
@@ -283,5 +285,40 @@ describe("VS1B cost scenario output", () => {
       cost_input_registry: incompleteRegistry,
       storage_root_uri: "drive://V4 Framework"
     })).toThrow("cost_line_input_not_found_in_registry");
+  });
+});
+
+describe("VS1B cost scenario persistence", () => {
+  it("builds a persistence record from a valid cost scenario output manifest", () => {
+    const manifest = buildScenarioManifest();
+    const persistence = buildCostScenarioPersistenceRecord({
+      scenario_output_manifest: manifest,
+      persisted_by: "controlled_validation",
+      confirmed_at: "2026-04-25T03:35:00.000Z"
+    });
+
+    expect(persistence.scenario_output_id).toBe(manifest.scenario_output_id);
+    expect(persistence.scenario_id).toBe("SCENARIO_COST_001");
+    expect(persistence.project_instance_id).toBe("SANDBOX_COST_001");
+    expect(persistence.source_export_id).toBe(QUANTITY_EXPORT.export_id);
+    expect(persistence.registry_id).toBe("REGISTRY_COST_INPUTS_001");
+    expect(persistence.registry_version).toBe("2026.04.25");
+    expect(persistence.storage_root_uri).toBe("drive://V4 Framework");
+    expect(persistence.storage_path).toBe("project-instances/SANDBOX_COST_001/cost-scenarios/SCENARIO_COST_001/SCENARIO_COST_001.json");
+    expect(persistence.content_type).toBe("application/json");
+    expect(persistence.total_cost).toBe(15160);
+    expect(persistence.persisted_by).toBe("controlled_validation");
+    expect(persistence.trace_refs).toContain(QUANTITY_EXPORT.export_id);
+    expect(persistence.trace_refs).toContain("REGISTRY_COST_INPUTS_001");
+  });
+
+  it("rejects persistence if source export trace is missing", () => {
+    const manifest = buildScenarioManifest();
+    expect(() => buildCostScenarioPersistenceRecord({
+      scenario_output_manifest: {
+        ...manifest,
+        trace_refs: manifest.trace_refs.filter((ref) => ref !== manifest.source_export_id)
+      }
+    })).toThrow("cost_scenario_output_missing_source_export_trace");
   });
 });
