@@ -5,6 +5,8 @@ export { buildCostInputRegistry } from "./cost-input-registry.js";
 export type { CostInputRegistry, CostInputRegistryInput } from "./cost-input-registry.js";
 export { buildCostScenarioOutputManifest } from "./cost-scenario-output.js";
 export type { CostScenarioOutputInput, CostScenarioOutputManifest } from "./cost-scenario-output.js";
+export { buildCostScenarioPersistenceRecord } from "./cost-scenario-persistence.js";
+export type { CostScenarioPersistenceInput, CostScenarioPersistenceRecord } from "./cost-scenario-persistence.js";
 
 export interface MaterialQuoteInput {
   quote_id: string;
