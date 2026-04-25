@@ -24,6 +24,12 @@ export interface UploadedDrawingInput {
   uploaded_at?: string;
 }
 
+export interface SheetIndexEntryInput {
+  sheet_number: string;
+  sheet_title?: string;
+  discipline?: string;
+}
+
 export interface DocumentRegistrationResult {
   project: ProjectInstance;
   source_document: SourceDocument;
@@ -31,6 +37,15 @@ export interface DocumentRegistrationResult {
   takeoff_items: TakeoffItem[];
   review_status: "registered_pending_sheet_index";
   next_required_action: "create_sheet_index";
+}
+
+export interface SheetIndexCreationResult {
+  project: ProjectInstance;
+  source_document: SourceDocument;
+  drawing_sheets: DrawingSheet[];
+  takeoff_items: TakeoffItem[];
+  review_status: "sheet_index_created_pending_takeoff";
+  next_required_action: "create_takeoff_candidates";
 }
 
 export interface SanitaryRunInput {
@@ -106,18 +121,42 @@ export function buildUploadRegistrationResult(input: {
   };
 }
 
-export function createDrawingSheet(project: ProjectInstance, source_document_id: string, sheet_number: string, sheet_title?: string): DrawingSheet {
+export function buildSheetIndexCreationResult(input: {
+  project: ProjectManifestInput;
+  uploaded_drawing: UploadedDrawingInput;
+  sheet_index: SheetIndexEntryInput[];
+}): SheetIndexCreationResult {
+  const project = createProjectInstance(input.project);
+  const source_document = registerUploadedDrawing(project, input.uploaded_drawing);
+  const drawing_sheets = createSheetIndex(project, source_document.source_document_id, input.sheet_index);
+  return {
+    project,
+    source_document,
+    drawing_sheets,
+    takeoff_items: [],
+    review_status: "sheet_index_created_pending_takeoff",
+    next_required_action: "create_takeoff_candidates"
+  };
+}
+
+export function createDrawingSheet(project: ProjectInstance, source_document_id: string, sheet_number: string, sheet_title?: string, discipline = "utilities"): DrawingSheet {
+  const normalizedSheetNumber = normalizeSheetNumber(sheet_number);
   return {
     project_instance_id: project.project_instance_id,
-    drawing_sheet_id: `SHEET_${sheet_number.replace(/[^A-Z0-9]/gi, "_")}`,
+    drawing_sheet_id: `SHEET_${normalizedSheetNumber}`,
     source_document_id,
     sheet_number,
     sheet_title,
-    discipline: "utilities",
+    discipline,
     data_layer: "project",
     source_origin: "project_upload",
     framework_version: project.framework_version
   };
+}
+
+export function createSheetIndex(project: ProjectInstance, source_document_id: string, sheets: SheetIndexEntryInput[]): DrawingSheet[] {
+  assertSheetIndex(sheets);
+  return sheets.map((sheet) => createDrawingSheet(project, source_document_id, sheet.sheet_number, sheet.sheet_title, sheet.discipline ?? "utilities"));
 }
 
 export function sanitaryRunsToTakeoffItems(project: ProjectInstance, runs: SanitaryRunInput[]): TakeoffItem[] {
@@ -168,6 +207,10 @@ function createSourceDocumentId(projectInstanceId: string, fileName: string): st
   return `DOC_${projectInstanceId}_${normalizedName}`;
 }
 
+function normalizeSheetNumber(sheetNumber: string): string {
+  return sheetNumber.trim().replace(/[^A-Z0-9]/gi, "_").replace(/_+/g, "_").toUpperCase();
+}
+
 function assertPdfUpload(upload: UploadedDrawingInput): void {
   if (!upload.file_name.toLowerCase().endsWith(".pdf")) {
     throw new Error("uploaded_drawing_must_be_pdf");
@@ -177,6 +220,24 @@ function assertPdfUpload(upload: UploadedDrawingInput): void {
   }
   if (upload.mime_type && upload.mime_type !== "application/pdf") {
     throw new Error("uploaded_drawing_mime_type_must_be_pdf");
+  }
+}
+
+function assertSheetIndex(sheets: SheetIndexEntryInput[]): void {
+  if (sheets.length === 0) {
+    throw new Error("sheet_index_required");
+  }
+
+  const seen = new Set<string>();
+  for (const sheet of sheets) {
+    const normalized = normalizeSheetNumber(sheet.sheet_number);
+    if (!normalized) {
+      throw new Error("sheet_number_required");
+    }
+    if (seen.has(normalized)) {
+      throw new Error("duplicate_sheet_number");
+    }
+    seen.add(normalized);
   }
 }
 
