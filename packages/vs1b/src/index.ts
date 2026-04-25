@@ -3,6 +3,8 @@ import type { DepthClass } from "@v4/domain";
 import type { QuantityExportObject, QuantitySummaryLine } from "@v4/vs1a";
 export { buildCostInputRegistry } from "./cost-input-registry.js";
 export type { CostInputRegistry, CostInputRegistryInput } from "./cost-input-registry.js";
+export { buildCostScenarioOutputManifest } from "./cost-scenario-output.js";
+export type { CostScenarioOutputInput, CostScenarioOutputManifest } from "./cost-scenario-output.js";
 
 export interface MaterialQuoteInput {
   quote_id: string;
