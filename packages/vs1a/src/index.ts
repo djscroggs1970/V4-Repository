@@ -5,6 +5,8 @@ export { applyTakeoffReviews, summarizeTakeoffReview } from "./review.js";
 export type { TakeoffDecision, TakeoffReviewInput, TakeoffReviewSummary } from "./review.js";
 export { buildQuantitySummary } from "./summary.js";
 export type { QuantitySummaryLine, QuantitySummaryResult } from "./summary.js";
+export { buildQuantityExport } from "./quantity-export.js";
+export type { QuantityExportInput, QuantityExportObject } from "./quantity-export.js";
 
 export interface ProjectManifestInput {
   project_instance_id: string;
