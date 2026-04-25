@@ -9,6 +9,8 @@ export { buildCostScenarioPersistenceRecord } from "./cost-scenario-persistence.
 export type { CostScenarioPersistenceInput, CostScenarioPersistenceRecord } from "./cost-scenario-persistence.js";
 export { buildEstimatePackageOutput } from "./estimate-package.js";
 export type { EstimatePackageInput, EstimatePackageOutput, EstimateTraceManifest } from "./estimate-package.js";
+export { buildEstimatePackagePersistenceRecord } from "./estimate-package-persistence.js";
+export type { EstimatePackagePersistenceInput, EstimatePackagePersistenceRecord } from "./estimate-package-persistence.js";
 
 export interface MaterialQuoteInput {
   quote_id: string;
