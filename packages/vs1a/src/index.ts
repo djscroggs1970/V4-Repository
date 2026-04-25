@@ -1,6 +1,8 @@
 import { FRAMEWORK_VERSION } from "@v4/config";
 import type { DepthClass, DrawingSheet, ProjectInstance, SourceDocument, TakeoffItem } from "@v4/domain";
 import { allocateRunToDepthBuckets } from "@v4/takeoff-engine";
+export { applyTakeoffReviews, summarizeTakeoffReview } from "./review.js";
+export type { TakeoffDecision, TakeoffReviewInput, TakeoffReviewSummary } from "./review.js";
 
 export interface ProjectManifestInput {
   project_instance_id: string;
