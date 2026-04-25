@@ -16,6 +16,23 @@ export interface SourceDocumentInput {
   drive_file_id?: string;
 }
 
+export interface UploadedDrawingInput {
+  file_name: string;
+  drive_file_id: string;
+  mime_type?: string;
+  size_bytes?: number;
+  uploaded_at?: string;
+}
+
+export interface DocumentRegistrationResult {
+  project: ProjectInstance;
+  source_document: SourceDocument;
+  drawing_sheets: DrawingSheet[];
+  takeoff_items: TakeoffItem[];
+  review_status: "registered_pending_sheet_index";
+  next_required_action: "create_sheet_index";
+}
+
 export interface SanitaryRunInput {
   run_id: string;
   source_sheet_id: string;
@@ -61,6 +78,31 @@ export function registerDrawingDocument(project: ProjectInstance, input: SourceD
     data_layer: "project",
     source_origin: "project_upload",
     framework_version: project.framework_version
+  };
+}
+
+export function registerUploadedDrawing(project: ProjectInstance, upload: UploadedDrawingInput): SourceDocument {
+  assertPdfUpload(upload);
+  return registerDrawingDocument(project, {
+    source_document_id: createSourceDocumentId(project.project_instance_id, upload.file_name),
+    file_name: upload.file_name,
+    drive_file_id: upload.drive_file_id
+  });
+}
+
+export function buildUploadRegistrationResult(input: {
+  project: ProjectManifestInput;
+  uploaded_drawing: UploadedDrawingInput;
+}): DocumentRegistrationResult {
+  const project = createProjectInstance(input.project);
+  const source_document = registerUploadedDrawing(project, input.uploaded_drawing);
+  return {
+    project,
+    source_document,
+    drawing_sheets: [],
+    takeoff_items: [],
+    review_status: "registered_pending_sheet_index",
+    next_required_action: "create_sheet_index"
   };
 }
 
@@ -119,6 +161,23 @@ export function buildVS1AResult(input: {
   const drawing_sheets = input.sheets.map((sheet) => createDrawingSheet(project, source_document.source_document_id, sheet.sheet_number, sheet.sheet_title));
   const takeoff_items = sanitaryRunsToTakeoffItems(project, input.runs);
   return { project, source_document, drawing_sheets, takeoff_items };
+}
+
+function createSourceDocumentId(projectInstanceId: string, fileName: string): string {
+  const normalizedName = fileName.replace(/\.[^.]+$/, "").replace(/[^A-Z0-9]/gi, "_").replace(/_+/g, "_").toUpperCase();
+  return `DOC_${projectInstanceId}_${normalizedName}`;
+}
+
+function assertPdfUpload(upload: UploadedDrawingInput): void {
+  if (!upload.file_name.toLowerCase().endsWith(".pdf")) {
+    throw new Error("uploaded_drawing_must_be_pdf");
+  }
+  if (!upload.drive_file_id) {
+    throw new Error("drive_file_id_required");
+  }
+  if (upload.mime_type && upload.mime_type !== "application/pdf") {
+    throw new Error("uploaded_drawing_mime_type_must_be_pdf");
+  }
 }
 
 function hasDepths(run: SanitaryRunInput): run is SanitaryRunInput & { upstream_depth_ft: number; downstream_depth_ft: number } {
