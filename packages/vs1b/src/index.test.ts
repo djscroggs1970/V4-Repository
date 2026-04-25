@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { QuantityExportObject } from "@v4/vs1a";
-import { buildCostBuildout } from "./index.js";
+import { buildCostBuildout, buildCostInputRegistry } from "./index.js";
 
 const QUANTITY_EXPORT: QuantityExportObject = {
   export_id: "QTY_EXPORT_SANDBOX_COST_001_20260425T030000000Z",
@@ -148,5 +148,78 @@ describe("VS1B cost buildout", () => {
       production_rates: PRODUCTION_RATES,
       scenario_id: "SCENARIO_COST_003"
     })).toThrow("material_quotes_required");
+  });
+});
+
+describe("VS1B cost input registry", () => {
+  it("builds a validated registry with traceable material labor equipment and production inputs", () => {
+    const registry = buildCostInputRegistry({
+      registry_id: "REGISTRY_COST_INPUTS_001",
+      registry_version: "2026.04.25",
+      material_quotes: MATERIAL_QUOTES,
+      labor_rates: LABOR_RATES,
+      equipment_rates: EQUIPMENT_RATES,
+      production_rates: PRODUCTION_RATES,
+      effective_at: "2026-04-25T03:15:00.000Z"
+    });
+
+    expect(registry.registry_id).toBe("REGISTRY_COST_INPUTS_001");
+    expect(registry.registry_version).toBe("2026.04.25");
+    expect(registry.validation_status).toBe("validated");
+    expect(registry.effective_at).toBe("2026-04-25T03:15:00.000Z");
+    expect(registry.material_quotes).toHaveLength(1);
+    expect(registry.labor_rates).toHaveLength(1);
+    expect(registry.equipment_rates).toHaveLength(1);
+    expect(registry.production_rates).toHaveLength(2);
+    expect(registry.trace_refs).toEqual([
+      "EQ-PIPE-001",
+      "LAB-CREW-PIPE-001",
+      "MAT-PVC-8-LF-001",
+      "PROD-PVC-8-A-001",
+      "PROD-PVC-8-B-001"
+    ]);
+  });
+
+  it("rejects duplicate production rate IDs", () => {
+    expect(() => buildCostInputRegistry({
+      registry_id: "REGISTRY_COST_INPUTS_002",
+      registry_version: "2026.04.25",
+      material_quotes: MATERIAL_QUOTES,
+      labor_rates: LABOR_RATES,
+      equipment_rates: EQUIPMENT_RATES,
+      production_rates: [PRODUCTION_RATES[0]!, PRODUCTION_RATES[0]!]
+    })).toThrow("duplicate_production_rate_id");
+  });
+
+  it("rejects production rates that reference unknown labor crews", () => {
+    expect(() => buildCostInputRegistry({
+      registry_id: "REGISTRY_COST_INPUTS_003",
+      registry_version: "2026.04.25",
+      material_quotes: MATERIAL_QUOTES,
+      labor_rates: LABOR_RATES,
+      equipment_rates: EQUIPMENT_RATES,
+      production_rates: [
+        {
+          ...PRODUCTION_RATES[0]!,
+          crew_code: "UNKNOWN_CREW"
+        }
+      ]
+    })).toThrow("production_rate_labor_rate_not_found");
+  });
+
+  it("rejects production rates that reference unknown equipment", () => {
+    expect(() => buildCostInputRegistry({
+      registry_id: "REGISTRY_COST_INPUTS_004",
+      registry_version: "2026.04.25",
+      material_quotes: MATERIAL_QUOTES,
+      labor_rates: LABOR_RATES,
+      equipment_rates: EQUIPMENT_RATES,
+      production_rates: [
+        {
+          ...PRODUCTION_RATES[0]!,
+          equipment_code: "UNKNOWN_EQUIPMENT"
+        }
+      ]
+    })).toThrow("production_rate_equipment_rate_not_found");
   });
 });
