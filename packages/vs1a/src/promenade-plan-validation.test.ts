@@ -7,7 +7,7 @@ import {
   buildTakeoffCandidateEntryResult
 } from "./index.js";
 
-const PROMENADE_SHEET_INDEX = [
+const CONTROLLED_PLAN_SHEET_INDEX = [
   { sheet_number: "C-00", sheet_title: "Cover", discipline: "general" },
   { sheet_number: "C-01", sheet_title: "Notes", discipline: "general" },
   { sheet_number: "C-02", sheet_title: "Zoning Conditions", discipline: "general" },
@@ -45,12 +45,12 @@ const PROMENADE_SHEET_INDEX = [
   { sheet_number: "D-6", sheet_title: "Construction Details", discipline: "details" }
 ];
 
-const PROMENADE_SANITARY_RUNS = [
+const CONTROLLED_SANITARY_RUNS = [
   {
-    run_id: "PROM-SSA1-SSA2",
+    run_id: "VALIDATION-SS-001",
     source_sheet_id: "SHEET_C_51",
-    from_structure: "SSA1",
-    to_structure: "SSA2",
+    from_structure: "SS-1",
+    to_structure: "SS-2",
     length_lf: 28,
     diameter_in: 8,
     material_type: "PVC_C900_DR18",
@@ -60,10 +60,10 @@ const PROMENADE_SANITARY_RUNS = [
     confidence: 0.95
   },
   {
-    run_id: "PROM-SSA2-SSA2A",
+    run_id: "VALIDATION-SS-002",
     source_sheet_id: "SHEET_C_51",
-    from_structure: "SSA2",
-    to_structure: "SSA2A",
+    from_structure: "SS-2",
+    to_structure: "SS-3",
     length_lf: 110,
     diameter_in: 8,
     material_type: "PVC_C900_DR18",
@@ -73,10 +73,10 @@ const PROMENADE_SANITARY_RUNS = [
     confidence: 0.95
   },
   {
-    run_id: "PROM-SSA2A-SSA2B",
+    run_id: "VALIDATION-SS-003",
     source_sheet_id: "SHEET_C_51",
-    from_structure: "SSA2A",
-    to_structure: "SSA2B",
+    from_structure: "SS-3",
+    to_structure: "SS-4",
     length_lf: 76,
     diameter_in: 8,
     material_type: "DIP_P401_CLASS_350",
@@ -86,10 +86,10 @@ const PROMENADE_SANITARY_RUNS = [
     confidence: 0.95
   },
   {
-    run_id: "PROM-SSA2B-SSA2C",
+    run_id: "VALIDATION-SS-004",
     source_sheet_id: "SHEET_C_51",
-    from_structure: "SSA2B",
-    to_structure: "SSA2C",
+    from_structure: "SS-4",
+    to_structure: "SS-5",
     length_lf: 142,
     diameter_in: 8,
     material_type: "DIP_P401_CLASS_350",
@@ -100,27 +100,27 @@ const PROMENADE_SANITARY_RUNS = [
   }
 ];
 
-describe("VS1A controlled real-plan validation - The Promenade", () => {
-  it("runs plan-derived sheet index and manually structured sanitary profile quantities through VS1A", () => {
+describe("VS1A controlled real-plan-style validation fixture", () => {
+  it("runs anonymized plan-derived sheet index and manually structured sanitary profile quantities through VS1A", () => {
     const candidate = buildTakeoffCandidateEntryResult({
       project: {
-        project_instance_id: "SANDBOX_PROMENADE_REV4_2025_08_22",
-        project_code: "PROMENADE_SANDBOX",
-        project_name: "The Promenade REV4 Controlled Validation"
+        project_instance_id: "SANDBOX_CONTROLLED_PLAN_VALIDATION_001",
+        project_code: "CONTROLLED_PLAN_SANDBOX",
+        project_name: "Controlled Real-Plan-Style Validation"
       },
       uploaded_drawing: {
-        file_name: "The Promenade - 2025-08-22 REV4.pdf",
-        drive_file_id: "source-tab-promenade-rev4",
+        file_name: "controlled-civil-plan-validation.pdf",
+        drive_file_id: "source-tab-controlled-plan-validation",
         mime_type: "application/pdf"
       },
-      sheet_index: PROMENADE_SHEET_INDEX,
-      runs: PROMENADE_SANITARY_RUNS
+      sheet_index: CONTROLLED_PLAN_SHEET_INDEX,
+      runs: CONTROLLED_SANITARY_RUNS
     });
 
-    expect(candidate.drawing_sheets).toHaveLength(PROMENADE_SHEET_INDEX.length);
+    expect(candidate.drawing_sheets).toHaveLength(CONTROLLED_PLAN_SHEET_INDEX.length);
     expect(candidate.drawing_sheets.map((sheet) => sheet.drawing_sheet_id)).toContain("SHEET_C_50");
     expect(candidate.drawing_sheets.map((sheet) => sheet.drawing_sheet_id)).toContain("SHEET_C_51");
-    expect(candidate.takeoff_items.every((item) => item.project_instance_id === "SANDBOX_PROMENADE_REV4_2025_08_22")).toBe(true);
+    expect(candidate.takeoff_items.every((item) => item.project_instance_id === "SANDBOX_CONTROLLED_PLAN_VALIDATION_001")).toBe(true);
     expect(candidate.takeoff_items.every((item) => item.source_sheet_id === "SHEET_C_51")).toBe(true);
 
     const reviewed = applyTakeoffReviews(candidate.takeoff_items, candidate.takeoff_items.map((item) => ({
@@ -157,7 +157,7 @@ describe("VS1A controlled real-plan validation - The Promenade", () => {
     });
 
     expect(exported.export_type).toBe("quantity_only");
-    expect(exported.project_instance_id).toBe("SANDBOX_PROMENADE_REV4_2025_08_22");
+    expect(exported.project_instance_id).toBe("SANDBOX_CONTROLLED_PLAN_VALIDATION_001");
     expect(exported.line_count).toBe(summary.lines.length);
     expect(persistence.storage_path).toBe(`project-instances/${exported.project_instance_id}/exports/quantity-only/${exported.export_id}.json`);
   });
