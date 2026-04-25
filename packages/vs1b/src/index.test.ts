@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import type { QuantityExportObject } from "@v4/vs1a";
-import { buildCostBuildout, buildCostInputRegistry, buildCostScenarioOutputManifest, buildCostScenarioPersistenceRecord } from "./index.js";
+import {
+  buildCostBuildout,
+  buildCostInputRegistry,
+  buildCostScenarioOutputManifest,
+  buildCostScenarioPersistenceRecord,
+  buildEstimatePackageOutput
+} from "./index.js";
 
 const QUANTITY_EXPORT: QuantityExportObject = {
   export_id: "QTY_EXPORT_SANDBOX_COST_001_20260425T030000000Z",
@@ -31,6 +37,20 @@ const QUANTITY_EXPORT: QuantityExportObject = {
       source_takeoff_item_ids: ["RUN-002_1"]
     }
   ]
+};
+
+const QUANTITY_EXPORT_PERSISTENCE = {
+  persistence_id: "PERSIST_QTY_EXPORT_SANDBOX_COST_001",
+  project_instance_id: "SANDBOX_COST_001",
+  export_id: QUANTITY_EXPORT.export_id,
+  export_type: "quantity_only" as const,
+  storage_root_uri: "drive://V4 Framework",
+  storage_path: `project-instances/${QUANTITY_EXPORT.project_instance_id}/exports/quantity-only/${QUANTITY_EXPORT.export_id}.json`,
+  content_type: "application/json" as const,
+  persisted_at: "2026-04-25T03:01:00.000Z",
+  framework_version: "0.1.0",
+  source_document_id: QUANTITY_EXPORT.source_document_id,
+  source_takeoff_item_ids: [...QUANTITY_EXPORT.source_takeoff_item_ids]
 };
 
 const MATERIAL_QUOTES = [
@@ -116,6 +136,14 @@ function buildScenarioManifest() {
     cost_input_registry: buildRegistry(),
     storage_root_uri: "drive://V4 Framework",
     persisted_at: "2026-04-25T03:30:00.000Z"
+  });
+}
+
+function buildScenarioPersistence() {
+  return buildCostScenarioPersistenceRecord({
+    scenario_output_manifest: buildScenarioManifest(),
+    persisted_by: "controlled_validation",
+    confirmed_at: "2026-04-25T03:35:00.000Z"
   });
 }
 
@@ -320,5 +348,67 @@ describe("VS1B cost scenario persistence", () => {
         trace_refs: manifest.trace_refs.filter((ref) => ref !== manifest.source_export_id)
       }
     })).toThrow("cost_scenario_output_missing_source_export_trace");
+  });
+});
+
+describe("estimate package output", () => {
+  it("assembles a controlled human-review package with trace manifest", () => {
+    const packageOutput = buildEstimatePackageOutput({
+      package_id: "ESTIMATE_PACKAGE_001",
+      quantity_export: QUANTITY_EXPORT,
+      quantity_export_persistence: QUANTITY_EXPORT_PERSISTENCE,
+      cost_buildout: buildScenario(),
+      cost_scenario_output: buildScenarioManifest(),
+      cost_scenario_persistence: buildScenarioPersistence(),
+      prepared_by: "controlled_validation",
+      prepared_at: "2026-04-25T03:45:00.000Z"
+    });
+
+    expect(packageOutput.package_id).toBe("ESTIMATE_PACKAGE_001");
+    expect(packageOutput.package_type).toBe("human_review_estimate_package");
+    expect(packageOutput.review_status).toBe("ready_for_human_review");
+    expect(packageOutput.project_instance_id).toBe("SANDBOX_COST_001");
+    expect(packageOutput.quantity_export_id).toBe(QUANTITY_EXPORT.export_id);
+    expect(packageOutput.cost_scenario_id).toBe("SCENARIO_COST_001");
+    expect(packageOutput.total_quantity_lines).toBe(2);
+    expect(packageOutput.total_cost_lines).toBe(2);
+    expect(packageOutput.total_cost).toBe(15160);
+    expect(packageOutput.storage_paths.quantity_export_path).toBe(QUANTITY_EXPORT_PERSISTENCE.storage_path);
+    expect(packageOutput.storage_paths.cost_scenario_path).toBe("project-instances/SANDBOX_COST_001/cost-scenarios/SCENARIO_COST_001/SCENARIO_COST_001.json");
+    expect(packageOutput.trace_manifest.quantity_export_id).toBe(QUANTITY_EXPORT.export_id);
+    expect(packageOutput.trace_manifest.registry_id).toBe("REGISTRY_COST_INPUTS_001");
+    expect(packageOutput.trace_manifest.source_takeoff_item_ids).toEqual(["RUN-001_1", "RUN-002_1"]);
+    expect(packageOutput.trace_manifest.trace_refs).toContain(QUANTITY_EXPORT.export_id);
+    expect(packageOutput.trace_manifest.trace_refs).toContain("REGISTRY_COST_INPUTS_001");
+    expect(packageOutput.trace_manifest.trace_refs).toContain("RUN-001_1");
+  });
+
+  it("rejects packages with mismatched project instance IDs", () => {
+    expect(() => buildEstimatePackageOutput({
+      package_id: "ESTIMATE_PACKAGE_BAD_PROJECT",
+      quantity_export: QUANTITY_EXPORT,
+      quantity_export_persistence: {
+        ...QUANTITY_EXPORT_PERSISTENCE,
+        project_instance_id: "OTHER_PROJECT"
+      },
+      cost_buildout: buildScenario(),
+      cost_scenario_output: buildScenarioManifest(),
+      cost_scenario_persistence: buildScenarioPersistence()
+    })).toThrow("estimate_package_project_instance_mismatch");
+  });
+
+  it("rejects packages missing takeoff trace coverage", () => {
+    const manifest = buildScenarioManifest();
+    expect(() => buildEstimatePackageOutput({
+      package_id: "ESTIMATE_PACKAGE_MISSING_TRACE",
+      quantity_export: QUANTITY_EXPORT,
+      quantity_export_persistence: QUANTITY_EXPORT_PERSISTENCE,
+      cost_buildout: buildScenario(),
+      cost_scenario_output: {
+        ...manifest,
+        trace_refs: manifest.trace_refs.filter((ref) => ref !== "RUN-001_1")
+      },
+      cost_scenario_persistence: buildScenarioPersistence()
+    })).toThrow("estimate_package_missing_takeoff_trace");
   });
 });
