@@ -2,7 +2,7 @@
 
 Status: active restart snapshot  
 Last updated: 2026-04-25  
-Current verified version: `v0.1-estimate-package-output-ci-pass`
+Current verified version: `v0.1-human-review-workflow-ci-pass`
 
 ## Purpose
 
@@ -33,7 +33,7 @@ VS1A is verified through sandbox plan harvest and quantity export persistence.
 
 ## Current verified VS1B chain
 
-VS1B is verified through estimate package output.
+VS1B is verified through human review workflow.
 
 1. Initial cost buildout from approved quantity exports
 2. Cost input registry
@@ -41,6 +41,8 @@ VS1B is verified through estimate package output.
 4. Cost scenario output manifest
 5. Cost scenario persistence record
 6. Estimate package output for controlled human review
+7. Estimate package persistence record
+8. Human review workflow for approve / reject / needs-review decisions
 
 ## Current implementation packages
 
@@ -73,7 +75,10 @@ packages/vs1b/src/cost-input-registry.ts
 packages/vs1b/src/cost-scenario-output.ts
 packages/vs1b/src/cost-scenario-persistence.ts
 packages/vs1b/src/estimate-package.ts
+packages/vs1b/src/estimate-package-persistence.ts
+packages/vs1b/src/estimate-package-review.ts
 packages/vs1b/src/index.test.ts
+packages/vs1b/src/estimate-package-persistence.test.ts
 ```
 
 ## Verified VS1A behavior
@@ -116,7 +121,12 @@ The current VS1B pipeline can:
 - persist cost scenario output records with storage path and trace references
 - block scenario output when cost line inputs are not present in the validated registry
 - assemble quantity export, quantity persistence, cost buildout, cost scenario output, cost scenario persistence, review status, storage paths, and trace manifest into a controlled human-review estimate package
+- persist estimate package records with project-instance isolation, package ID, review status, storage path, total cost, and trace references
 - reject estimate packages with project-instance mismatches or missing takeoff trace coverage
+- create human review records for approved, rejected, and needs-review estimate packages
+- require review notes for rejected or needs-review estimate packages
+- block rejected or needs-review packages from external/bid-grade release
+- mark approved packages eligible for release workflow
 
 ## Current guardrails
 
@@ -129,6 +139,7 @@ The current VS1B pipeline can:
 - Cost scenarios may consume only approved quantity exports and validated cost input registries.
 - Placeholder production rates may exist in tests but must be blocked from estimate output.
 - Estimate packages are for controlled human review, not autonomous bid submission.
+- Rejected or needs-review estimate packages must be resolved before release.
 - CI must pass before a slice is marked verified.
 
 ## Current CI command set
@@ -154,18 +165,18 @@ Some standalone sample scripts may exist outside CI and should be treated as sup
 Recommended next slice:
 
 ```text
-Estimate Package Persistence
+Bid-Grade Output Release Gate
 ```
 
-Goal: persist the estimate package output with project-instance isolation, package ID, review status, source quantity export, cost scenario output, persistence records, trace manifest, and storage path.
+Goal: create the final release gate that consumes only approved human-review records and produces a controlled bid-grade/client-facing release manifest.
 
 After that, the likely next product slice is:
 
 ```text
-Human Review Workflow
+Output Document Generation
 ```
 
-Goal: define approve/reject/needs-review workflow for estimate packages before any bid-grade or client-facing output can be released.
+Goal: generate readable estimate output documents from approved release manifests while preserving traceability and project-instance isolation.
 
 ## New session boot instruction
 
