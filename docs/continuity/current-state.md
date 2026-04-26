@@ -2,7 +2,7 @@
 
 Status: active restart snapshot  
 Last updated: 2026-04-26  
-Current verified version: `v0.1-audit-review-promotion-gate-ci-pass`
+Current verified version: `v0.1-vendor-quote-intake-ci-pass`
 
 ## Purpose
 
@@ -17,6 +17,20 @@ This document is the compact restart point for future V4 Civil Estimating Platfo
 - Codex repo contract: `AGENTS.md`
 - Continuity guide: `docs/continuity/source-of-truth.md`
 - Production-rate policy: `docs/governance/production-rate-source-policy.md`
+
+## Latest verified checkpoint
+
+`v0.1-vendor-quote-intake-ci-pass`
+
+Evidence:
+
+```text
+PR: #12 Add vendor quote intake normalization
+PR head SHA: d35a0f4f303b14185685679d80c23d8492b18e5a
+GitHub Actions CI run: 24969955061
+CI conclusion: success
+Merge SHA: 87620447c29a220c9494f58e806171db027f0d23
+```
 
 ## Current verified VS1A chain
 
@@ -36,7 +50,7 @@ VS1A is verified through the audit review / candidate promotion gate.
 
 ## Current verified VS1B chain
 
-VS1B is verified through controlled transmission adapter boundary.
+VS1B is verified through vendor quote intake / normalized pricing schema.
 
 1. Initial cost buildout from approved quantity exports
 2. Cost input registry
@@ -54,10 +68,11 @@ VS1B is verified through controlled transmission adapter boundary.
 14. External share / delivery manifest
 15. Delivery persistence / external transmission gate
 16. Controlled transmission adapter boundary
+17. Vendor quote intake / normalized pricing schema
 
 ## Current verified governance/tooling chain
 
-V4 now includes a controlled Codex command lane.
+V4 includes a controlled Codex command lane.
 
 1. Codex can be used as a repo-bound implementation assistant.
 2. This chat remains the task controller and governance reviewer.
@@ -114,6 +129,7 @@ packages/vs1b/src/client-package-release-gate.ts
 packages/vs1b/src/delivery-manifest.ts
 packages/vs1b/src/delivery-transmission-gate.ts
 packages/vs1b/src/controlled-adapter-boundary.ts
+packages/vs1b/src/vendor-quote-intake.ts
 packages/vs1b/src/index.test.ts
 packages/vs1b/src/estimate-package-persistence.test.ts
 packages/vs1b/src/bid-grade-release-gate.test.ts
@@ -124,6 +140,7 @@ packages/vs1b/src/client-package-release-gate.test.ts
 packages/vs1b/src/delivery-manifest.test.ts
 packages/vs1b/src/delivery-transmission-gate.test.ts
 packages/vs1b/src/controlled-adapter-boundary.test.ts
+packages/vs1b/src/vendor-quote-intake.test.ts
 ```
 
 Key governance/tooling files:
@@ -158,18 +175,10 @@ The current VS1A pipeline can:
 - create a project-isolated quantity export persistence manifest
 - create a sanitary utility extraction audit harness for classifying candidate findings
 - classify audit records as found utility runs, uncertain candidates, excluded non-target items, or unresolved plan questions
-- preserve project, document, sheet, candidate, page, excerpt, and candidate snapshot trace in audit records
-- reject audit records with project-instance mismatches, source-document mismatches, unknown sheets, duplicate sheet IDs, duplicate candidate IDs, or missing required IDs
-- keep audit results provisional with `audit_status: provisional_incomplete`
-- keep audit results from claiming completion with `completeness_claim: not_claimed`
+- keep extraction audit results provisional with `audit_status: provisional_incomplete` and `completeness_claim: not_claimed`
 - require human review for every extraction audit record
-- require reviewer identity for audit review decisions
-- require notes for rejected or needs-review audit review decisions
-- reject duplicate or unknown audit review rows
 - allow only approved found-run audit records with required handoff fields to become eligible for takeoff review
-- keep uncertain, excluded, unresolved, rejected, needs-review, and unreviewed audit records blocked or open
-- mark promoted audit candidates as `eligible_for_takeoff_review`, `review_status: pending`, and `quantity_export_ready: false`
-- preserve audit, project, document, sheet, candidate, audit-record, and review-gate trace references through promotion gate output
+- keep promoted audit candidates pending takeoff review and not quantity-export-ready
 
 ## Verified VS1B behavior
 
@@ -188,50 +197,20 @@ The current VS1B pipeline can:
 - preserve quantity export, takeoff item, quote, labor, equipment, production-rate, and registry traceability
 - create a project-isolated cost scenario output manifest
 - persist cost scenario output records with storage path and trace references
-- block scenario output when cost line inputs are not present in the validated registry
-- assemble quantity export, quantity persistence, cost buildout, cost scenario output, cost scenario persistence, review status, storage paths, and trace manifest into a controlled human-review estimate package
-- persist estimate package records with project-instance isolation, package ID, review status, storage path, total cost, and trace references
-- reject estimate packages with project-instance mismatches or missing takeoff trace coverage
-- create human review records for approved, rejected, and needs-review estimate packages
-- require review notes for rejected or needs-review estimate packages
-- block rejected or needs-review packages from external/bid-grade release
-- mark approved packages eligible for release workflow
-- build a bid-grade release manifest only from an approved human-review record, matching estimate package output, and matching estimate package persistence record
-- reject bid-grade release when package, persistence, review, project instance, storage path, or trace coverage checks fail
-- mark approved release manifests ready for output document generation
-- generate a controlled output document set only from a ready bid-grade release manifest
-- create estimate summary, cost breakdown, quantity/cost trace exhibit, and client-facing export manifest document objects
-- preserve release, package, review, quantity export, cost scenario, registry, source document, and takeoff trace references in generated output document objects
-- reject output document generation when release status/action or trace coverage is invalid
-- mark generated output document sets pending persistence and review
-- persist generated output document sets with project-instance storage paths and trace references
-- create output document review records for approved, rejected, and needs-review decisions
-- require review notes for rejected or needs-review output document decisions
-- block unapproved output documents from client-facing export package assembly
-- mark approved output documents eligible for client-facing export package assembly
-- assemble a controlled client-facing export package manifest only from persisted output documents and an approved output document review record
-- preserve document set, output persistence, output review, release, estimate package, quantity export, cost scenario, and document trace references in the client-facing export package manifest
-- reject client-facing export package assembly for rejected or needs-review output document review records
-- reject client-facing export package assembly when document set, persistence, review, project instance, release, package, quantity export, cost scenario, document coverage, storage path, or trace checks fail
-- keep assembled client-facing export packages pending a separate distribution gate
-- persist assembled client-facing export package manifests with project-instance storage paths and trace references
-- create client package release gate records for approved, rejected, and needs-review decisions
-- require review notes for rejected or needs-review client package release gate decisions
-- block delivery manifest generation unless the persisted client export package is approved at the release gate
-- mark approved persisted client export packages eligible for delivery manifest generation
-- create delivery manifest records only from persisted client export packages and approved client package release gate records
-- preserve client export package, persistence, release gate, release, estimate package, quantity export, cost scenario, and document trace references in delivery manifests
-- reject delivery manifest generation for rejected or needs-review release gate records
-- reject delivery manifest generation when package, persistence, project instance, document coverage, storage path, or trace checks fail
-- keep delivery manifests prepared pending a final external transmission gate
-- persist prepared delivery manifest records with project-instance storage paths and trace references
-- create external transmission gate records for approved, rejected, and needs-review decisions
-- require review notes for rejected or needs-review external transmission gate decisions
-- block future adapter-boundary preparation unless the persisted delivery manifest is approved at the external transmission gate
-- mark approved persisted delivery manifests authorized for adapter-boundary preparation only, not for live transmission
-- define controlled adapter-boundary records for future external transfer paths
-- keep all adapter-boundary execution disabled pending governance enablement
-- ensure controlled adapter boundaries never email, upload, send, or externally distribute files
+- assemble and persist controlled human-review estimate packages
+- create estimate package human review records and block rejected or needs-review packages from release
+- build bid-grade release manifests only from approved human-review records and trace-complete package/persistence records
+- generate controlled output document sets only from approved release manifests
+- persist and review generated output document sets
+- assemble client-facing export package manifests only from persisted and approved output document review records
+- persist client-facing export packages and require a release gate before delivery manifest generation
+- create and persist delivery manifests without transmitting, uploading, emailing, or externally distributing files
+- create external transmission gate records that authorize only future adapter-boundary preparation
+- define disabled controlled adapter-boundary records for future external transfer paths
+- normalize user-provided vendor quote lines into traceable material quote records
+- preserve vendor quote batch, project instance, source document, source file, vendor, quote-line, and normalized quote trace references
+- keep normalized vendor quote records pending registry review and not automatically merged into the validated cost input registry
+- reject duplicate quote line IDs, missing quote identity fields, invalid material/diameter/uom/unit-cost fields, unsupported currency, and non-upload source origins
 
 ## Current guardrails
 
@@ -247,17 +226,11 @@ The current VS1B pipeline can:
 - Promoted audit candidates must still pass takeoff review before quantity summary or export.
 - Cost scenarios may consume only approved quantity exports and validated cost input registries.
 - Placeholder production rates may exist in tests but must be blocked from estimate output.
+- Vendor quote intake may normalize only user-provided quote data and must not invent unit costs or vendor assumptions.
+- Normalized vendor quote records must remain pending registry review before they can feed validated cost input registries.
+- Labor rates, equipment rates, and production rates must not be created from vendor quote intake unless a future explicit slice and review workflow allows it.
 - Estimate packages are for controlled human review, not autonomous bid submission.
-- Rejected or needs-review estimate packages must be resolved before release.
-- Bid-grade release manifests may consume only approved human-review records and trace-complete package/persistence records.
-- Output document generation may consume approved release manifests, not raw/unreviewed estimate packages.
-- Generated output documents are not externally shareable until persisted and reviewed.
-- Client-facing export package assembly may consume only persisted and approved output document review records.
-- Client-facing export packages are not externally distributable until the distribution gate is implemented and approved.
-- Delivery manifest generation may consume only persisted client export packages with approved client package release gate records.
-- Delivery manifests do not transmit, upload, email, or externally distribute files.
-- Delivery manifest persistence and external transmission gates do not transmit, upload, email, or externally distribute files.
-- External transmission approval currently authorizes only future adapter-boundary preparation.
+- Generated output documents, client-facing export packages, delivery manifests, and adapter-boundary records do not transmit, upload, email, or externally distribute files.
 - Controlled adapter-boundary records must keep execution disabled until governance explicitly enables it.
 - Codex must follow `AGENTS.md` and cannot mark anything verified without CI evidence.
 - CI must pass before a slice is marked verified.
@@ -268,6 +241,13 @@ The VS1A sanitary utility extraction audit harness and audit review promotion ga
 
 ```text
 @v4/vs1a
+```
+
+The VS1B vendor quote intake module is verified and exposed through both the VS1B root package barrel export and package subpath export:
+
+```text
+@v4/vs1b
+@v4/vs1b/vendor-quote-intake
 ```
 
 The output document persistence/review, client-facing export package, client package release gate, delivery manifest, delivery transmission gate, and controlled adapter boundary modules are verified and exposed through package subpath exports:
@@ -281,7 +261,7 @@ The output document persistence/review, client-facing export package, client pac
 @v4/vs1b/controlled-adapter-boundary
 ```
 
-Direct root `packages/vs1b/src/index.ts` barrel exports for these modules remain follow-up cleanup items. Attempts to patch that file through the GitHub connector were blocked by the tool safety layer. Package subpath exports in `packages/vs1b/package.json` were added instead and CI passed after those patches.
+Direct root `packages/vs1b/src/index.ts` barrel exports for the older document/delivery modules remain follow-up cleanup items. Package subpath exports in `packages/vs1b/package.json` are verified.
 
 ## Current CI command set
 
@@ -303,7 +283,7 @@ Some standalone sample scripts may exist outside CI and should be treated as sup
 
 ## Codex command lane
 
-Codex is now available as a controlled implementation assistant for V4.
+Codex is available as a controlled implementation assistant for V4.
 
 Operating model:
 
@@ -325,28 +305,28 @@ Rules:
 
 Known Codex environment limitation:
 
-- During the first Codex test, Codex could create the local `AGENTS.md` commit but could not push/open a visible PR because GitHub push failed with a CONNECT tunnel 403 and `gh` was unavailable.
-- During the sanitary utility audit harness and audit review promotion gate slices, Codex drafted local changes but could not open visible PRs. The visible PRs were recreated through the GitHub connector after confirming changed-file scope.
+- Codex has previously drafted local changes but could not always push/open visible PRs because of environment restrictions.
+- Visible PRs may be recreated through the GitHub connector only after confirming changed-file scope and preserving V4 guardrails.
 
 ## Next logical slice
 
 Recommended next slice:
 
 ```text
-Vendor Quote Intake / Normalized Pricing Schema
-```
-
-Goal: ingest uploaded quote data into controlled, traceable pricing records that can merge into the cost input registry without inventing unit costs or vendor assumptions.
-
-Important boundary: this slice should not invent vendor pricing, labor rates, equipment rates, or production rates. It should normalize only user-provided quote data and preserve source-file traceability.
-
-After that, the likely next product slice is:
-
-```text
 Promoted Audit Candidate to Takeoff Candidate Handoff
 ```
 
 Goal: convert promotion-gate eligible records into controlled takeoff candidate inputs that still require the existing takeoff review workflow before quantity summary/export.
+
+Important boundary: this slice must not claim complete sewer extraction, must not bypass takeoff review, and must not make promoted audit candidates quantity-export-ready.
+
+After that, the likely pricing-side slice is:
+
+```text
+Vendor Quote Registry Merge Review Gate
+```
+
+Goal: review normalized vendor quote records and allow only approved quote records to merge into the validated cost input registry without inventing pricing or bypassing traceability.
 
 ## New session boot instruction
 
@@ -357,6 +337,7 @@ This is a V4 Civil Estimating Platform session.
 Use GitHub `djscroggs1970/V4-Repository`, Airtable `V4 Base`, Drive `V4 Framework`, and ClickUp `V4 Framework` as the external sources of truth.
 Read `AGENTS.md`, `docs/continuity/source-of-truth.md`, `docs/continuity/current-state.md`, and `docs/governance/production-rate-source-policy.md` before continuing.
 Codex is available as a controlled implementation assistant, but this chat remains task controller/reviewer and Codex must follow AGENTS.md.
+Current verified version: `v0.1-vendor-quote-intake-ci-pass`.
 Current goal: [one sentence].
 Do not rely on prior job data unless explicitly provided.
 Maintain job-instance isolation and no-bleed/no-drift rules.
