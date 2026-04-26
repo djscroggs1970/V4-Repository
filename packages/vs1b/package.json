@@ -24,6 +24,10 @@
     "./delivery-manifest": {
       "types": "./dist/delivery-manifest.d.ts",
       "default": "./dist/delivery-manifest.js"
+    },
+    "./delivery-transmission-gate": {
+      "types": "./dist/delivery-transmission-gate.d.ts",
+      "default": "./dist/delivery-transmission-gate.js"
     }
   },
   "scripts": {
