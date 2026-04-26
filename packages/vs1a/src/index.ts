@@ -12,8 +12,18 @@ export type { QuantityExportPersistenceInput, QuantityExportPersistenceRecord } 
 export { buildPlanHarvestSandboxResult } from "./plan-harvest.js";
 export type { HarvestedSanitaryRunInput, PlanHarvestProvenanceRecord, PlanHarvestSandboxResult } from "./plan-harvest.js";
 export { buildSewerExtractionAuditResult } from "./sewer-extraction-audit.js";
+export { buildAuditReviewPromotionGateResult } from "./audit-review-gate.js";
+export type {
+  AuditReviewDecision,
+  AuditReviewDecisionInput,
+  AuditReviewPromotionCounts,
+  AuditReviewPromotionGateResult,
+  BlockedAuditCandidate,
+  PromotedAuditCandidate
+} from "./audit-review-gate.js";
 export type {
   SewerExtractionAuditCandidateInput,
+  SewerExtractionAuditCandidateSnapshot,
   SewerExtractionAuditConfidenceBand,
   SewerExtractionAuditDecision,
   SewerExtractionAuditDecisionCounts,

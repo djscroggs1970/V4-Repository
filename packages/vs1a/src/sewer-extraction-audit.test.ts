@@ -36,6 +36,15 @@ describe("VS1A sewer extraction completeness audit harness", () => {
     expect(result.records[0]?.reason_codes).toContain("strong_sewer_indicator_with_required_attributes");
     expect(result.records[0]?.confidence_band).toBe("high");
     expect(result.counts.found_sewer_run).toBe(1);
+    expect(result.records[0]?.candidate_snapshot).toMatchObject({
+      candidate_id: "CAND-001",
+      project_instance_id: "PRJ_AUDIT_001",
+      source_document_id: "DOC_AUDIT_001",
+      source_sheet_id: "SHEET_C_51",
+      material_type: "PVC_C900_DR18",
+      diameter_in: 8,
+      length_lf: 36
+    });
   });
 
   it("classifies ambiguous utility line as uncertain", () => {
