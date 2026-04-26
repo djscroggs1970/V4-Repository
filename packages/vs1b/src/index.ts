@@ -13,6 +13,8 @@ export { buildEstimatePackagePersistenceRecord } from "./estimate-package-persis
 export type { EstimatePackagePersistenceInput, EstimatePackagePersistenceRecord } from "./estimate-package-persistence.js";
 export { buildEstimatePackageReviewRecord } from "./estimate-package-review.js";
 export type { EstimatePackageReviewDecision, EstimatePackageReviewInput, EstimatePackageReviewRecord } from "./estimate-package-review.js";
+export { buildBidGradeReleaseManifest } from "./bid-grade-release-gate.js";
+export type { BidGradeReleaseGateInput, BidGradeReleaseManifest, BidGradeReleaseTraceManifest } from "./bid-grade-release-gate.js";
 
 export interface MaterialQuoteInput {
   quote_id: string;
