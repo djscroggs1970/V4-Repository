@@ -2,7 +2,7 @@
 
 Status: active restart snapshot  
 Last updated: 2026-04-26  
-Current verified version: `v0.1-bid-grade-release-gate-ci-pass`
+Current verified version: `v0.1-output-document-generation-ci-pass`
 
 ## Purpose
 
@@ -33,7 +33,7 @@ VS1A is verified through sandbox plan harvest and quantity export persistence.
 
 ## Current verified VS1B chain
 
-VS1B is verified through bid-grade release gate.
+VS1B is verified through output document generation.
 
 1. Initial cost buildout from approved quantity exports
 2. Cost input registry
@@ -44,6 +44,7 @@ VS1B is verified through bid-grade release gate.
 7. Estimate package persistence record
 8. Human review workflow for approve / reject / needs-review decisions
 9. Bid-grade output release gate
+10. Output document generation
 
 ## Current implementation packages
 
@@ -79,9 +80,11 @@ packages/vs1b/src/estimate-package.ts
 packages/vs1b/src/estimate-package-persistence.ts
 packages/vs1b/src/estimate-package-review.ts
 packages/vs1b/src/bid-grade-release-gate.ts
+packages/vs1b/src/output-document-generation.ts
 packages/vs1b/src/index.test.ts
 packages/vs1b/src/estimate-package-persistence.test.ts
 packages/vs1b/src/bid-grade-release-gate.test.ts
+packages/vs1b/src/output-document-generation.test.ts
 ```
 
 ## Verified VS1A behavior
@@ -133,6 +136,11 @@ The current VS1B pipeline can:
 - build a bid-grade release manifest only from an approved human-review record, matching estimate package output, and matching estimate package persistence record
 - reject bid-grade release when package, persistence, review, project instance, storage path, or trace coverage checks fail
 - mark approved release manifests ready for output document generation
+- generate a controlled output document set only from a ready bid-grade release manifest
+- create estimate summary, cost breakdown, quantity/cost trace exhibit, and client-facing export manifest document objects
+- preserve release, package, review, quantity export, cost scenario, registry, source document, and takeoff trace references in generated output document objects
+- reject output document generation when release status/action or trace coverage is invalid
+- mark generated output document sets pending persistence and review
 
 ## Current guardrails
 
@@ -148,6 +156,7 @@ The current VS1B pipeline can:
 - Rejected or needs-review estimate packages must be resolved before release.
 - Bid-grade release manifests may consume only approved human-review records and trace-complete package/persistence records.
 - Output document generation may consume approved release manifests, not raw/unreviewed estimate packages.
+- Generated output documents are not externally shareable until persisted and reviewed.
 - CI must pass before a slice is marked verified.
 
 ## Current CI command set
@@ -173,20 +182,20 @@ Some standalone sample scripts may exist outside CI and should be treated as sup
 Recommended next slice:
 
 ```text
-Output Document Generation
-```
-
-Goal: generate readable estimate output documents from approved release manifests while preserving traceability and project-instance isolation.
-
-Important boundary: this slice should consume `BidGradeReleaseManifest` and should not restart full PDF intelligence, autonomous plan harvest, or live job extraction unless a later current-state document explicitly authorizes that step.
-
-After that, the likely next product slice is:
-
-```text
 Output Document Persistence and Review
 ```
 
 Goal: persist generated bid/client-facing output artifacts with storage paths, document manifests, trace references, and a controlled review status before external sharing.
+
+Important boundary: this slice should consume generated output document sets and should not create final externally shareable documents until persistence and review controls exist.
+
+After that, the likely next product slice is:
+
+```text
+Client-Facing Export Package
+```
+
+Goal: assemble persisted and reviewed output documents into a controlled external/client-facing export package with final release status and traceability.
 
 ## New session boot instruction
 
