@@ -9,6 +9,10 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./vendor-quote-intake": {
+      "types": "./dist/vendor-quote-intake.d.ts",
+      "default": "./dist/vendor-quote-intake.js"
+    },
     "./output-document-persistence-review": {
       "types": "./dist/output-document-persistence-review.d.ts",
       "default": "./dist/output-document-persistence-review.js"
