@@ -15,6 +15,14 @@ export { buildEstimatePackageReviewRecord } from "./estimate-package-review.js";
 export type { EstimatePackageReviewDecision, EstimatePackageReviewInput, EstimatePackageReviewRecord } from "./estimate-package-review.js";
 export { buildBidGradeReleaseManifest } from "./bid-grade-release-gate.js";
 export type { BidGradeReleaseGateInput, BidGradeReleaseManifest, BidGradeReleaseTraceManifest } from "./bid-grade-release-gate.js";
+export { buildOutputDocumentGenerationResult } from "./output-document-generation.js";
+export type {
+  GeneratedOutputDocument,
+  OutputDocumentGenerationInput,
+  OutputDocumentGenerationResult,
+  OutputDocumentSection,
+  OutputDocumentType
+} from "./output-document-generation.js";
 
 export interface MaterialQuoteInput {
   quote_id: string;
