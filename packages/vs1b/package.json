@@ -16,6 +16,10 @@
     "./client-export-package": {
       "types": "./dist/client-export-package.d.ts",
       "default": "./dist/client-export-package.js"
+    },
+    "./client-package-release-gate": {
+      "types": "./dist/client-package-release-gate.d.ts",
+      "default": "./dist/client-package-release-gate.js"
     }
   },
   "scripts": {
