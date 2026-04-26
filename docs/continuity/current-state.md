@@ -2,7 +2,7 @@
 
 Status: active restart snapshot  
 Last updated: 2026-04-26  
-Current verified version: `v0.1-client-package-release-gate-ci-pass`
+Current verified version: `v0.1-delivery-manifest-ci-pass`
 
 ## Purpose
 
@@ -33,7 +33,7 @@ VS1A is verified through sandbox plan harvest and quantity export persistence.
 
 ## Current verified VS1B chain
 
-VS1B is verified through client export persistence / distribution gate.
+VS1B is verified through external share / delivery manifest.
 
 1. Initial cost buildout from approved quantity exports
 2. Cost input registry
@@ -48,6 +48,7 @@ VS1B is verified through client export persistence / distribution gate.
 11. Output document persistence and review
 12. Client-facing export package assembly
 13. Client export persistence / distribution gate
+14. External share / delivery manifest
 
 ## Current implementation packages
 
@@ -88,6 +89,7 @@ packages/vs1b/src/output-document-generation.ts
 packages/vs1b/src/output-document-persistence-review.ts
 packages/vs1b/src/client-export-package.ts
 packages/vs1b/src/client-package-release-gate.ts
+packages/vs1b/src/delivery-manifest.ts
 packages/vs1b/src/index.test.ts
 packages/vs1b/src/estimate-package-persistence.test.ts
 packages/vs1b/src/bid-grade-release-gate.test.ts
@@ -95,6 +97,7 @@ packages/vs1b/src/output-document-generation.test.ts
 packages/vs1b/src/output-document-persistence-review.test.ts
 packages/vs1b/src/client-export-package.test.ts
 packages/vs1b/src/client-package-release-gate.test.ts
+packages/vs1b/src/delivery-manifest.test.ts
 ```
 
 ## Verified VS1A behavior
@@ -166,6 +169,11 @@ The current VS1B pipeline can:
 - require review notes for rejected or needs-review client package release gate decisions
 - block delivery manifest generation unless the persisted client export package is approved at the release gate
 - mark approved persisted client export packages eligible for delivery manifest generation
+- create delivery manifest records only from persisted client export packages and approved client package release gate records
+- preserve client export package, persistence, release gate, release, estimate package, quantity export, cost scenario, and document trace references in delivery manifests
+- reject delivery manifest generation for rejected or needs-review release gate records
+- reject delivery manifest generation when package, persistence, project instance, document coverage, storage path, or trace checks fail
+- keep delivery manifests prepared pending a final external transmission gate
 
 ## Current guardrails
 
@@ -185,16 +193,18 @@ The current VS1B pipeline can:
 - Client-facing export package assembly may consume only persisted and approved output document review records.
 - Client-facing export packages are not externally distributable until the distribution gate is implemented and approved.
 - Delivery manifest generation may consume only persisted client export packages with approved client package release gate records.
+- Delivery manifests do not transmit, upload, email, or externally distribute files.
 - CI must pass before a slice is marked verified.
 
 ## Current export surface note
 
-The output document persistence/review, client-facing export package, and client package release gate modules are verified and exposed through package subpath exports:
+The output document persistence/review, client-facing export package, client package release gate, and delivery manifest modules are verified and exposed through package subpath exports:
 
 ```text
 @v4/vs1b/output-document-persistence-review
 @v4/vs1b/client-export-package
 @v4/vs1b/client-package-release-gate
+@v4/vs1b/delivery-manifest
 ```
 
 Direct root `packages/vs1b/src/index.ts` barrel exports for these modules remain follow-up cleanup items. Attempts to patch that file through the GitHub connector were blocked by the tool safety layer. Package subpath exports in `packages/vs1b/package.json` were added instead and CI passed after those patches.
@@ -222,20 +232,20 @@ Some standalone sample scripts may exist outside CI and should be treated as sup
 Recommended next slice:
 
 ```text
-External Share / Delivery Manifest
-```
-
-Goal: record controlled delivery metadata for approved client-facing export packages without bypassing project-instance isolation, traceability, or human review requirements.
-
-Important boundary: this slice should consume only persisted client export packages and approved client package release gate records. It should not transmit files, email clients, upload to portals, or otherwise distribute externally.
-
-After that, the likely next product slice is:
-
-```text
 Delivery Persistence / External Transmission Gate
 ```
 
 Goal: persist delivery manifest records and require an explicit final human authorization gate before any actual external transmission workflow is introduced.
+
+Important boundary: this slice should consume prepared delivery manifests and should not transmit files, email clients, upload to portals, or otherwise distribute externally.
+
+After that, the likely next product slice is:
+
+```text
+Controlled Transmission Adapter Boundary
+```
+
+Goal: define the adapter interface for future external transmission while keeping real transmission disabled until governance explicitly enables it.
 
 ## New session boot instruction
 
