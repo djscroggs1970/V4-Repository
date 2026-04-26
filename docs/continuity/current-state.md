@@ -1,8 +1,8 @@
 # V4 Current State
 
 Status: active restart snapshot  
-Last updated: 2026-04-25  
-Current verified version: `v0.1-human-review-workflow-ci-pass`
+Last updated: 2026-04-26  
+Current verified version: `v0.1-bid-grade-release-gate-ci-pass`
 
 ## Purpose
 
@@ -33,7 +33,7 @@ VS1A is verified through sandbox plan harvest and quantity export persistence.
 
 ## Current verified VS1B chain
 
-VS1B is verified through human review workflow.
+VS1B is verified through bid-grade release gate.
 
 1. Initial cost buildout from approved quantity exports
 2. Cost input registry
@@ -43,6 +43,7 @@ VS1B is verified through human review workflow.
 6. Estimate package output for controlled human review
 7. Estimate package persistence record
 8. Human review workflow for approve / reject / needs-review decisions
+9. Bid-grade output release gate
 
 ## Current implementation packages
 
@@ -77,8 +78,10 @@ packages/vs1b/src/cost-scenario-persistence.ts
 packages/vs1b/src/estimate-package.ts
 packages/vs1b/src/estimate-package-persistence.ts
 packages/vs1b/src/estimate-package-review.ts
+packages/vs1b/src/bid-grade-release-gate.ts
 packages/vs1b/src/index.test.ts
 packages/vs1b/src/estimate-package-persistence.test.ts
+packages/vs1b/src/bid-grade-release-gate.test.ts
 ```
 
 ## Verified VS1A behavior
@@ -127,6 +130,9 @@ The current VS1B pipeline can:
 - require review notes for rejected or needs-review estimate packages
 - block rejected or needs-review packages from external/bid-grade release
 - mark approved packages eligible for release workflow
+- build a bid-grade release manifest only from an approved human-review record, matching estimate package output, and matching estimate package persistence record
+- reject bid-grade release when package, persistence, review, project instance, storage path, or trace coverage checks fail
+- mark approved release manifests ready for output document generation
 
 ## Current guardrails
 
@@ -140,6 +146,8 @@ The current VS1B pipeline can:
 - Placeholder production rates may exist in tests but must be blocked from estimate output.
 - Estimate packages are for controlled human review, not autonomous bid submission.
 - Rejected or needs-review estimate packages must be resolved before release.
+- Bid-grade release manifests may consume only approved human-review records and trace-complete package/persistence records.
+- Output document generation may consume approved release manifests, not raw/unreviewed estimate packages.
 - CI must pass before a slice is marked verified.
 
 ## Current CI command set
@@ -165,18 +173,20 @@ Some standalone sample scripts may exist outside CI and should be treated as sup
 Recommended next slice:
 
 ```text
-Bid-Grade Output Release Gate
-```
-
-Goal: create the final release gate that consumes only approved human-review records and produces a controlled bid-grade/client-facing release manifest.
-
-After that, the likely next product slice is:
-
-```text
 Output Document Generation
 ```
 
 Goal: generate readable estimate output documents from approved release manifests while preserving traceability and project-instance isolation.
+
+Important boundary: this slice should consume `BidGradeReleaseManifest` and should not restart full PDF intelligence, autonomous plan harvest, or live job extraction unless a later current-state document explicitly authorizes that step.
+
+After that, the likely next product slice is:
+
+```text
+Output Document Persistence and Review
+```
+
+Goal: persist generated bid/client-facing output artifacts with storage paths, document manifests, trace references, and a controlled review status before external sharing.
 
 ## New session boot instruction
 
