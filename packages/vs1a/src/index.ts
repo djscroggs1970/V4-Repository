@@ -11,6 +11,16 @@ export { buildQuantityExportPersistenceRecord } from "./export-persistence.js";
 export type { QuantityExportPersistenceInput, QuantityExportPersistenceRecord } from "./export-persistence.js";
 export { buildPlanHarvestSandboxResult } from "./plan-harvest.js";
 export type { HarvestedSanitaryRunInput, PlanHarvestProvenanceRecord, PlanHarvestSandboxResult } from "./plan-harvest.js";
+export { buildSewerExtractionAuditResult } from "./sewer-extraction-audit.js";
+export type {
+  SewerExtractionAuditCandidateInput,
+  SewerExtractionAuditConfidenceBand,
+  SewerExtractionAuditDecision,
+  SewerExtractionAuditDecisionCounts,
+  SewerExtractionAuditInput,
+  SewerExtractionAuditRecord,
+  SewerExtractionAuditResult
+} from "./sewer-extraction-audit.js";
 
 export interface ProjectManifestInput {
   project_instance_id: string;
