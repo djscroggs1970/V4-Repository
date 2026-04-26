@@ -2,7 +2,7 @@
 
 Status: active restart snapshot  
 Last updated: 2026-04-26  
-Current verified version: `v0.1-output-document-generation-ci-pass`
+Current verified version: `v0.1-output-document-persistence-review-ci-pass`
 
 ## Purpose
 
@@ -33,7 +33,7 @@ VS1A is verified through sandbox plan harvest and quantity export persistence.
 
 ## Current verified VS1B chain
 
-VS1B is verified through output document generation.
+VS1B is verified through output document persistence and review.
 
 1. Initial cost buildout from approved quantity exports
 2. Cost input registry
@@ -45,6 +45,7 @@ VS1B is verified through output document generation.
 8. Human review workflow for approve / reject / needs-review decisions
 9. Bid-grade output release gate
 10. Output document generation
+11. Output document persistence and review
 
 ## Current implementation packages
 
@@ -72,6 +73,7 @@ packages/vs1a/src/promenade-plan-validation.test.ts
 Key VS1B files:
 
 ```text
+packages/vs1b/package.json
 packages/vs1b/src/index.ts
 packages/vs1b/src/cost-input-registry.ts
 packages/vs1b/src/cost-scenario-output.ts
@@ -81,10 +83,12 @@ packages/vs1b/src/estimate-package-persistence.ts
 packages/vs1b/src/estimate-package-review.ts
 packages/vs1b/src/bid-grade-release-gate.ts
 packages/vs1b/src/output-document-generation.ts
+packages/vs1b/src/output-document-persistence-review.ts
 packages/vs1b/src/index.test.ts
 packages/vs1b/src/estimate-package-persistence.test.ts
 packages/vs1b/src/bid-grade-release-gate.test.ts
 packages/vs1b/src/output-document-generation.test.ts
+packages/vs1b/src/output-document-persistence-review.test.ts
 ```
 
 ## Verified VS1A behavior
@@ -141,6 +145,11 @@ The current VS1B pipeline can:
 - preserve release, package, review, quantity export, cost scenario, registry, source document, and takeoff trace references in generated output document objects
 - reject output document generation when release status/action or trace coverage is invalid
 - mark generated output document sets pending persistence and review
+- persist generated output document sets with project-instance storage paths and trace references
+- create output document review records for approved, rejected, and needs-review decisions
+- require review notes for rejected or needs-review output document decisions
+- block unapproved output documents from client-facing export package assembly
+- mark approved output documents eligible for client-facing export package assembly
 
 ## Current guardrails
 
@@ -157,7 +166,18 @@ The current VS1B pipeline can:
 - Bid-grade release manifests may consume only approved human-review records and trace-complete package/persistence records.
 - Output document generation may consume approved release manifests, not raw/unreviewed estimate packages.
 - Generated output documents are not externally shareable until persisted and reviewed.
+- Client-facing export package assembly may consume only persisted and approved output document review records.
 - CI must pass before a slice is marked verified.
+
+## Current export surface note
+
+The output document persistence/review module is verified and exposed through a package subpath export:
+
+```text
+@v4/vs1b/output-document-persistence-review
+```
+
+A direct root `packages/vs1b/src/index.ts` barrel export for this module remains a follow-up cleanup item. Attempts to patch that file through the GitHub connector were blocked by the tool safety layer. The package subpath export in `packages/vs1b/package.json` was added instead and CI passed after that patch.
 
 ## Current CI command set
 
@@ -182,20 +202,20 @@ Some standalone sample scripts may exist outside CI and should be treated as sup
 Recommended next slice:
 
 ```text
-Output Document Persistence and Review
-```
-
-Goal: persist generated bid/client-facing output artifacts with storage paths, document manifests, trace references, and a controlled review status before external sharing.
-
-Important boundary: this slice should consume generated output document sets and should not create final externally shareable documents until persistence and review controls exist.
-
-After that, the likely next product slice is:
-
-```text
 Client-Facing Export Package
 ```
 
 Goal: assemble persisted and reviewed output documents into a controlled external/client-facing export package with final release status and traceability.
+
+Important boundary: this slice should consume persisted output document records and approved output document review records. It should not start full PDF intelligence, plan harvest, or autonomous job extraction.
+
+After that, the likely next product slice is:
+
+```text
+Client Export Persistence / Distribution Gate
+```
+
+Goal: persist the final client-facing export package and require an explicit distribution/release gate before any external sharing.
 
 ## New session boot instruction
 
