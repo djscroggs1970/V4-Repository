@@ -2,7 +2,7 @@
 
 Status: active restart snapshot  
 Last updated: 2026-04-26  
-Current verified version: `v0.1-codex-repo-contract-ci-pass`
+Current verified version: `v0.1-sewer-extraction-audit-ci-pass`
 
 ## Purpose
 
@@ -20,7 +20,7 @@ This document is the compact restart point for future V4 Civil Estimating Platfo
 
 ## Current verified VS1A chain
 
-VS1A is verified through sandbox plan harvest and quantity export persistence.
+VS1A is verified through the utility extraction audit harness.
 
 1. Upload registration
 2. Sheet index creation
@@ -31,6 +31,7 @@ VS1A is verified through sandbox plan harvest and quantity export persistence.
 7. Quantity export persistence manifest
 8. Sanitized controlled real-plan-style validation
 9. Plan harvest sandbox with review/export gates
+10. Utility extraction completeness audit harness for sanitary scope
 
 ## Current verified VS1B chain
 
@@ -84,9 +85,11 @@ packages/vs1a/src/summary.ts
 packages/vs1a/src/quantity-export.ts
 packages/vs1a/src/export-persistence.ts
 packages/vs1a/src/plan-harvest.ts
+packages/vs1a/src/sewer-extraction-audit.ts
 packages/vs1a/src/index.test.ts
 packages/vs1a/src/plan-harvest.test.ts
 packages/vs1a/src/promenade-plan-validation.test.ts
+packages/vs1a/src/sewer-extraction-audit.test.ts
 ```
 
 Key VS1B files:
@@ -150,6 +153,13 @@ The current VS1A pipeline can:
 - create a quantity-only export object
 - block export when review items are still open
 - create a project-isolated quantity export persistence manifest
+- create a sanitary utility extraction audit harness for classifying candidate findings
+- classify audit records as found utility runs, uncertain candidates, excluded non-target items, or unresolved plan questions
+- preserve project, document, sheet, candidate, page, and excerpt trace references in audit records
+- reject audit records with project-instance mismatches, source-document mismatches, unknown sheets, duplicate sheet IDs, duplicate candidate IDs, or missing required IDs
+- keep audit results provisional with `audit_status: provisional_incomplete`
+- keep audit results from claiming completion with `completeness_claim: not_claimed`
+- require human review for every extraction audit record
 
 ## Verified VS1B behavior
 
@@ -221,6 +231,8 @@ The current VS1B pipeline can:
 - Every project/job instance must carry its own `project_instance_id`.
 - Framework, sandbox, and project data must remain separated.
 - Only approved reviewed takeoff items can feed quantity summary or export.
+- Extraction audit harnesses are not complete extraction claims.
+- Audit outputs must remain provisional and human-review gated until explicitly resolved by future governance.
 - Cost scenarios may consume only approved quantity exports and validated cost input registries.
 - Placeholder production rates may exist in tests but must be blocked from estimate output.
 - Estimate packages are for controlled human review, not autonomous bid submission.
@@ -239,6 +251,12 @@ The current VS1B pipeline can:
 - CI must pass before a slice is marked verified.
 
 ## Current export surface note
+
+The VS1A sanitary utility extraction audit harness is verified and exposed through the VS1A root package barrel export:
+
+```text
+@v4/vs1a
+```
 
 The output document persistence/review, client-facing export package, client package release gate, delivery manifest, delivery transmission gate, and controlled adapter boundary modules are verified and exposed through package subpath exports:
 
@@ -296,19 +314,19 @@ Rules:
 Known Codex environment limitation:
 
 - During the first Codex test, Codex could create the local `AGENTS.md` commit but could not push/open a visible PR because GitHub push failed with a CONNECT tunnel 403 and `gh` was unavailable.
-- The visible PR was recreated through the GitHub connector after confirming Codex changed only `AGENTS.md`.
+- During the sanitary utility audit harness slice, Codex again drafted local changes but could not open a visible PR. The visible PR was recreated through the GitHub connector after confirming the changed-file scope.
 
 ## Next logical slice
 
 Recommended next slice:
 
 ```text
-Sewer Extraction Completeness Audit
+Audit Review / Candidate Promotion Gate
 ```
 
-Goal: audit the PDF intelligence gap for sanitary sewer by identifying all sewer-bearing sheets, extracting all visible sewer run candidates, and reporting unresolved/uncertain runs before any real plan-output test is treated as complete.
+Goal: add a human-review gate for sanitary utility extraction audit records so reviewed found runs can be promoted to controlled takeoff candidates while uncertain, excluded, and unresolved records remain blocked from quantity export.
 
-Important boundary: this slice should produce a completeness/audit harness and should not claim full sewer extraction is complete unless the audit proves it. It should not create bid-grade output or costing from partial harvest data.
+Important boundary: this slice should not perform autonomous full PDF extraction or claim full extraction completion. It should only govern review decisions and promotion eligibility for audit records.
 
 After that, the likely next product slice is:
 
