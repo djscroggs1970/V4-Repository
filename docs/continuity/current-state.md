@@ -2,7 +2,7 @@
 
 Status: active restart snapshot  
 Last updated: 2026-04-26  
-Current verified version: `v0.1-output-document-persistence-review-ci-pass`
+Current verified version: `v0.1-client-export-package-ci-pass`
 
 ## Purpose
 
@@ -33,7 +33,7 @@ VS1A is verified through sandbox plan harvest and quantity export persistence.
 
 ## Current verified VS1B chain
 
-VS1B is verified through output document persistence and review.
+VS1B is verified through client-facing export package assembly.
 
 1. Initial cost buildout from approved quantity exports
 2. Cost input registry
@@ -46,6 +46,7 @@ VS1B is verified through output document persistence and review.
 9. Bid-grade output release gate
 10. Output document generation
 11. Output document persistence and review
+12. Client-facing export package assembly
 
 ## Current implementation packages
 
@@ -84,11 +85,13 @@ packages/vs1b/src/estimate-package-review.ts
 packages/vs1b/src/bid-grade-release-gate.ts
 packages/vs1b/src/output-document-generation.ts
 packages/vs1b/src/output-document-persistence-review.ts
+packages/vs1b/src/client-export-package.ts
 packages/vs1b/src/index.test.ts
 packages/vs1b/src/estimate-package-persistence.test.ts
 packages/vs1b/src/bid-grade-release-gate.test.ts
 packages/vs1b/src/output-document-generation.test.ts
 packages/vs1b/src/output-document-persistence-review.test.ts
+packages/vs1b/src/client-export-package.test.ts
 ```
 
 ## Verified VS1A behavior
@@ -150,6 +153,11 @@ The current VS1B pipeline can:
 - require review notes for rejected or needs-review output document decisions
 - block unapproved output documents from client-facing export package assembly
 - mark approved output documents eligible for client-facing export package assembly
+- assemble a controlled client-facing export package manifest only from persisted output documents and an approved output document review record
+- preserve document set, output persistence, output review, release, estimate package, quantity export, cost scenario, and document trace references in the client-facing export package manifest
+- reject client-facing export package assembly for rejected or needs-review output document review records
+- reject client-facing export package assembly when document set, persistence, review, project instance, release, package, quantity export, cost scenario, document coverage, storage path, or trace checks fail
+- keep assembled client-facing export packages pending a separate distribution gate
 
 ## Current guardrails
 
@@ -167,17 +175,19 @@ The current VS1B pipeline can:
 - Output document generation may consume approved release manifests, not raw/unreviewed estimate packages.
 - Generated output documents are not externally shareable until persisted and reviewed.
 - Client-facing export package assembly may consume only persisted and approved output document review records.
+- Client-facing export packages are not externally distributable until the distribution gate is implemented and approved.
 - CI must pass before a slice is marked verified.
 
 ## Current export surface note
 
-The output document persistence/review module is verified and exposed through a package subpath export:
+The output document persistence/review and client-facing export package modules are verified and exposed through package subpath exports:
 
 ```text
 @v4/vs1b/output-document-persistence-review
+@v4/vs1b/client-export-package
 ```
 
-A direct root `packages/vs1b/src/index.ts` barrel export for this module remains a follow-up cleanup item. Attempts to patch that file through the GitHub connector were blocked by the tool safety layer. The package subpath export in `packages/vs1b/package.json` was added instead and CI passed after that patch.
+Direct root `packages/vs1b/src/index.ts` barrel exports for these modules remain follow-up cleanup items. Attempts to patch that file through the GitHub connector were blocked by the tool safety layer. Package subpath exports in `packages/vs1b/package.json` were added instead and CI passed after those patches.
 
 ## Current CI command set
 
@@ -202,20 +212,20 @@ Some standalone sample scripts may exist outside CI and should be treated as sup
 Recommended next slice:
 
 ```text
-Client-Facing Export Package
+Client Export Persistence / Distribution Gate
 ```
 
-Goal: assemble persisted and reviewed output documents into a controlled external/client-facing export package with final release status and traceability.
+Goal: persist the assembled client-facing export package and require an explicit distribution/release gate before any external sharing.
 
-Important boundary: this slice should consume persisted output document records and approved output document review records. It should not start full PDF intelligence, plan harvest, or autonomous job extraction.
+Important boundary: this slice should consume assembled client-facing export package manifests and should not distribute externally until a separate approval/status transition is recorded.
 
 After that, the likely next product slice is:
 
 ```text
-Client Export Persistence / Distribution Gate
+External Share / Delivery Manifest
 ```
 
-Goal: persist the final client-facing export package and require an explicit distribution/release gate before any external sharing.
+Goal: record controlled delivery metadata for approved client-facing export packages without bypassing project-instance isolation, traceability, or human review requirements.
 
 ## New session boot instruction
 
