@@ -2,7 +2,7 @@
 
 Status: active restart snapshot  
 Last updated: 2026-04-26  
-Current verified version: `v0.1-sewer-extraction-audit-ci-pass`
+Current verified version: `v0.1-audit-review-promotion-gate-ci-pass`
 
 ## Purpose
 
@@ -20,7 +20,7 @@ This document is the compact restart point for future V4 Civil Estimating Platfo
 
 ## Current verified VS1A chain
 
-VS1A is verified through the utility extraction audit harness.
+VS1A is verified through the audit review / candidate promotion gate.
 
 1. Upload registration
 2. Sheet index creation
@@ -32,6 +32,7 @@ VS1A is verified through the utility extraction audit harness.
 8. Sanitized controlled real-plan-style validation
 9. Plan harvest sandbox with review/export gates
 10. Utility extraction completeness audit harness for sanitary scope
+11. Audit review / candidate promotion gate
 
 ## Current verified VS1B chain
 
@@ -86,10 +87,12 @@ packages/vs1a/src/quantity-export.ts
 packages/vs1a/src/export-persistence.ts
 packages/vs1a/src/plan-harvest.ts
 packages/vs1a/src/sewer-extraction-audit.ts
+packages/vs1a/src/audit-review-gate.ts
 packages/vs1a/src/index.test.ts
 packages/vs1a/src/plan-harvest.test.ts
 packages/vs1a/src/promenade-plan-validation.test.ts
 packages/vs1a/src/sewer-extraction-audit.test.ts
+packages/vs1a/src/audit-review-gate.test.ts
 ```
 
 Key VS1B files:
@@ -155,11 +158,18 @@ The current VS1A pipeline can:
 - create a project-isolated quantity export persistence manifest
 - create a sanitary utility extraction audit harness for classifying candidate findings
 - classify audit records as found utility runs, uncertain candidates, excluded non-target items, or unresolved plan questions
-- preserve project, document, sheet, candidate, page, and excerpt trace references in audit records
+- preserve project, document, sheet, candidate, page, excerpt, and candidate snapshot trace in audit records
 - reject audit records with project-instance mismatches, source-document mismatches, unknown sheets, duplicate sheet IDs, duplicate candidate IDs, or missing required IDs
 - keep audit results provisional with `audit_status: provisional_incomplete`
 - keep audit results from claiming completion with `completeness_claim: not_claimed`
 - require human review for every extraction audit record
+- require reviewer identity for audit review decisions
+- require notes for rejected or needs-review audit review decisions
+- reject duplicate or unknown audit review rows
+- allow only approved found-run audit records with required handoff fields to become eligible for takeoff review
+- keep uncertain, excluded, unresolved, rejected, needs-review, and unreviewed audit records blocked or open
+- mark promoted audit candidates as `eligible_for_takeoff_review`, `review_status: pending`, and `quantity_export_ready: false`
+- preserve audit, project, document, sheet, candidate, audit-record, and review-gate trace references through promotion gate output
 
 ## Verified VS1B behavior
 
@@ -233,6 +243,8 @@ The current VS1B pipeline can:
 - Only approved reviewed takeoff items can feed quantity summary or export.
 - Extraction audit harnesses are not complete extraction claims.
 - Audit outputs must remain provisional and human-review gated until explicitly resolved by future governance.
+- Audit promotion gate outputs are not quantity-export-ready.
+- Promoted audit candidates must still pass takeoff review before quantity summary or export.
 - Cost scenarios may consume only approved quantity exports and validated cost input registries.
 - Placeholder production rates may exist in tests but must be blocked from estimate output.
 - Estimate packages are for controlled human review, not autonomous bid submission.
@@ -252,7 +264,7 @@ The current VS1B pipeline can:
 
 ## Current export surface note
 
-The VS1A sanitary utility extraction audit harness is verified and exposed through the VS1A root package barrel export:
+The VS1A sanitary utility extraction audit harness and audit review promotion gate are verified and exposed through the VS1A root package barrel export:
 
 ```text
 @v4/vs1a
@@ -314,27 +326,27 @@ Rules:
 Known Codex environment limitation:
 
 - During the first Codex test, Codex could create the local `AGENTS.md` commit but could not push/open a visible PR because GitHub push failed with a CONNECT tunnel 403 and `gh` was unavailable.
-- During the sanitary utility audit harness slice, Codex again drafted local changes but could not open a visible PR. The visible PR was recreated through the GitHub connector after confirming the changed-file scope.
+- During the sanitary utility audit harness and audit review promotion gate slices, Codex drafted local changes but could not open visible PRs. The visible PRs were recreated through the GitHub connector after confirming changed-file scope.
 
 ## Next logical slice
 
 Recommended next slice:
 
 ```text
-Audit Review / Candidate Promotion Gate
-```
-
-Goal: add a human-review gate for sanitary utility extraction audit records so reviewed found runs can be promoted to controlled takeoff candidates while uncertain, excluded, and unresolved records remain blocked from quantity export.
-
-Important boundary: this slice should not perform autonomous full PDF extraction or claim full extraction completion. It should only govern review decisions and promotion eligibility for audit records.
-
-After that, the likely next product slice is:
-
-```text
 Vendor Quote Intake / Normalized Pricing Schema
 ```
 
 Goal: ingest uploaded quote data into controlled, traceable pricing records that can merge into the cost input registry without inventing unit costs or vendor assumptions.
+
+Important boundary: this slice should not invent vendor pricing, labor rates, equipment rates, or production rates. It should normalize only user-provided quote data and preserve source-file traceability.
+
+After that, the likely next product slice is:
+
+```text
+Promoted Audit Candidate to Takeoff Candidate Handoff
+```
+
+Goal: convert promotion-gate eligible records into controlled takeoff candidate inputs that still require the existing takeoff review workflow before quantity summary/export.
 
 ## New session boot instruction
 
