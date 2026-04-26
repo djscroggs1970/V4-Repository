@@ -20,6 +20,10 @@
     "./client-package-release-gate": {
       "types": "./dist/client-package-release-gate.d.ts",
       "default": "./dist/client-package-release-gate.js"
+    },
+    "./delivery-manifest": {
+      "types": "./dist/delivery-manifest.d.ts",
+      "default": "./dist/delivery-manifest.js"
     }
   },
   "scripts": {
