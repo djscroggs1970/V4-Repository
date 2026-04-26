@@ -28,6 +28,10 @@
     "./delivery-transmission-gate": {
       "types": "./dist/delivery-transmission-gate.d.ts",
       "default": "./dist/delivery-transmission-gate.js"
+    },
+    "./controlled-adapter-boundary": {
+      "types": "./dist/controlled-adapter-boundary.d.ts",
+      "default": "./dist/controlled-adapter-boundary.js"
     }
   },
   "scripts": {
