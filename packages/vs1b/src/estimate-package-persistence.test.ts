@@ -6,7 +6,8 @@ import {
   buildCostScenarioOutputManifest,
   buildCostScenarioPersistenceRecord,
   buildEstimatePackageOutput,
-  buildEstimatePackagePersistenceRecord
+  buildEstimatePackagePersistenceRecord,
+  buildEstimatePackageReviewRecord
 } from "./index.js";
 
 const quantityExport: QuantityExportObject = {
@@ -128,6 +129,15 @@ function buildEstimatePackage() {
   });
 }
 
+function buildEstimatePackagePersistence() {
+  return buildEstimatePackagePersistenceRecord({
+    estimate_package: buildEstimatePackage(),
+    storage_root_uri: "drive://V4 Framework",
+    persisted_by: "controlled_validation",
+    persisted_at: "2026-04-25T04:09:00.000Z"
+  });
+}
+
 describe("estimate package persistence", () => {
   it("builds a project-isolated persistence record for a human-review estimate package", () => {
     const estimatePackage = buildEstimatePackage();
@@ -171,5 +181,82 @@ describe("estimate package persistence", () => {
       },
       storage_root_uri: "drive://V4 Framework"
     })).toThrow("estimate_package_missing_registry_trace");
+  });
+});
+
+describe("estimate package human review workflow", () => {
+  it("marks an approved estimate package eligible for bid-grade output", () => {
+    const estimatePackage = buildEstimatePackage();
+    const persistence = buildEstimatePackagePersistence();
+    const review = buildEstimatePackageReviewRecord({
+      estimate_package: estimatePackage,
+      estimate_package_persistence: persistence,
+      decision: "approved",
+      reviewer: "senior_estimator",
+      reviewed_at: "2026-04-25T04:15:00.000Z"
+    });
+
+    expect(review.package_id).toBe("ESTIMATE_PACKAGE_PERSIST_001");
+    expect(review.package_persistence_id).toBe(persistence.persistence_id);
+    expect(review.project_instance_id).toBe("SANDBOX_PACKAGE_001");
+    expect(review.decision).toBe("approved");
+    expect(review.client_release_status).toBe("eligible_for_bid_grade_output");
+    expect(review.next_required_action).toBe("release_bid_grade_output");
+    expect(review.trace_refs).toContain(estimatePackage.package_id);
+    expect(review.trace_refs).toContain(persistence.persistence_id);
+    expect(review.trace_refs).toContain(quantityExport.export_id);
+  });
+
+  it("blocks rejected estimate packages from bid-grade output and requires a note", () => {
+    const estimatePackage = buildEstimatePackage();
+    const persistence = buildEstimatePackagePersistence();
+    const review = buildEstimatePackageReviewRecord({
+      estimate_package: estimatePackage,
+      estimate_package_persistence: persistence,
+      decision: "rejected",
+      reviewer: "senior_estimator",
+      note: "Material quote is stale.",
+      reviewed_at: "2026-04-25T04:16:00.000Z"
+    });
+
+    expect(review.decision).toBe("rejected");
+    expect(review.client_release_status).toBe("blocked_from_bid_grade_output");
+    expect(review.next_required_action).toBe("resolve_estimate_package_review");
+
+    expect(() => buildEstimatePackageReviewRecord({
+      estimate_package: estimatePackage,
+      estimate_package_persistence: persistence,
+      decision: "rejected",
+      reviewer: "senior_estimator"
+    })).toThrow("estimate_package_review_note_required");
+  });
+
+  it("blocks needs-review estimate packages from bid-grade output and requires a note", () => {
+    const estimatePackage = buildEstimatePackage();
+    const persistence = buildEstimatePackagePersistence();
+    const review = buildEstimatePackageReviewRecord({
+      estimate_package: estimatePackage,
+      estimate_package_persistence: persistence,
+      decision: "needs_review",
+      reviewer: "senior_estimator",
+      note: "Confirm production rate against job constraints.",
+      reviewed_at: "2026-04-25T04:17:00.000Z"
+    });
+
+    expect(review.decision).toBe("needs_review");
+    expect(review.client_release_status).toBe("blocked_from_bid_grade_output");
+    expect(review.next_required_action).toBe("resolve_estimate_package_review");
+  });
+
+  it("rejects review records with mismatched persistence", () => {
+    expect(() => buildEstimatePackageReviewRecord({
+      estimate_package: buildEstimatePackage(),
+      estimate_package_persistence: {
+        ...buildEstimatePackagePersistence(),
+        package_id: "OTHER_PACKAGE"
+      },
+      decision: "approved",
+      reviewer: "senior_estimator"
+    })).toThrow("estimate_package_persistence_mismatch");
   });
 });
