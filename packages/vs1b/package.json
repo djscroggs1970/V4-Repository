@@ -12,6 +12,10 @@
     "./output-document-persistence-review": {
       "types": "./dist/output-document-persistence-review.d.ts",
       "default": "./dist/output-document-persistence-review.js"
+    },
+    "./client-export-package": {
+      "types": "./dist/client-export-package.d.ts",
+      "default": "./dist/client-export-package.js"
     }
   },
   "scripts": {
