@@ -1,0 +1,61 @@
+{
+  "project_instance_id": "PRJ_PACKET_DETAIL_001",
+  "source_document_id": "DOC_PACKET_DETAIL_001",
+  "provisional_status": "provisional_pending_manual_review",
+  "review_gated": true,
+  "hard_guardrail_confirmation": {
+    "quantities_extracted": false,
+    "takeoff_items_created": false,
+    "cost_outputs_created": false,
+    "pricing_records_created": false,
+    "production_rate_records_created": false,
+    "review_gated": true
+  },
+  "sheet_classifications": [
+    {
+      "sheet_id": "D-1",
+      "sheet_title": "Construction Details",
+      "sheet_class": "detail",
+      "confidence": 0.59,
+      "provisional_status": "provisional",
+      "trace_refs": ["sheet:D-1", "note:broad_details"]
+    }
+  ],
+  "possible_relationships": [
+    {
+      "relationship_id": "REL_DETAIL_001",
+      "relationship_type": "depends_on",
+      "from_sheet_id": "D-1",
+      "to_sheet_id": "C-50",
+      "confidence": 0.5,
+      "provisional_status": "provisional",
+      "trace_refs": ["note:details_apply_to_profile"]
+    }
+  ],
+  "source_artifact_register": [
+    {
+      "artifact_id": "ART_DETAIL_001",
+      "artifact_type": "notes_capture",
+      "source_document_id": "DOC_PACKET_DETAIL_001",
+      "storage_ref": "synthetic://packetization/details/notes",
+      "page_range": { "start_page": 4, "end_page": 4 },
+      "provisional_status": "provisional",
+      "trace_refs": ["capture:detail_notes"]
+    }
+  ],
+  "manual_confirmation_flags": [
+    {
+      "flag_code": "broad_construction_detail_sheets",
+      "required": true,
+      "reason": "Details are too broad for automated relationship confidence.",
+      "trace_refs": ["issue:broad_details"]
+    },
+    {
+      "flag_code": "low_confidence_classifications",
+      "required": true,
+      "reason": "Classification confidence below threshold.",
+      "trace_refs": ["confidence:0.59"]
+    }
+  ],
+  "trace_refs": ["project:PRJ_PACKET_DETAIL_001", "document:DOC_PACKET_DETAIL_001"]
+}

@@ -1,0 +1,63 @@
+{
+  "project_instance_id": "PRJ_PACKET_DUP_001",
+  "source_document_id": "PLACEHOLDER_SOURCE_DOCUMENT_ID",
+  "provisional_status": "provisional_pending_manual_review",
+  "review_gated": true,
+  "hard_guardrail_confirmation": {
+    "quantities_extracted": false,
+    "takeoff_items_created": false,
+    "cost_outputs_created": false,
+    "pricing_records_created": false,
+    "production_rate_records_created": false,
+    "review_gated": true
+  },
+  "sheet_classifications": [
+    {
+      "sheet_id": "C-40",
+      "sheet_title": "Utility Plan A",
+      "sheet_class": "plan",
+      "confidence": 0.88,
+      "provisional_status": "provisional",
+      "trace_refs": ["sheet:C-40", "note:first_occurrence"]
+    },
+    {
+      "sheet_id": "C-40",
+      "sheet_title": "Utility Plan A Duplicate",
+      "sheet_class": "plan",
+      "confidence": 0.73,
+      "provisional_status": "provisional",
+      "trace_refs": ["sheet:C-40", "note:duplicate_occurrence"]
+    }
+  ],
+  "possible_relationships": [
+    {
+      "relationship_id": "REL_DUP_001",
+      "relationship_type": "see_also",
+      "from_sheet_id": "C-40",
+      "to_sheet_id": "C-40",
+      "confidence": 0.61,
+      "provisional_status": "provisional",
+      "trace_refs": ["note:duplicate_reference"]
+    }
+  ],
+  "source_artifact_register": [
+    {
+      "artifact_id": "ART_DUP_001",
+      "artifact_type": "sheet_index_capture",
+      "source_document_id": "PLACEHOLDER_SOURCE_DOCUMENT_ID",
+      "storage_ref": "synthetic://packetization/duplicate/index",
+      "page_range": { "start_page": 1, "end_page": 1 },
+      "provisional_status": "provisional",
+      "trace_refs": ["capture:index"]
+    }
+  ],
+  "manual_confirmation_flags": [
+    {
+      "flag_code": "duplicate_sheet_ids",
+      "required": true,
+      "reason": "Duplicate sheet identifier detected.",
+      "trace_refs": ["duplicate:sheet:C-40"]
+    }
+  ],
+  "trace_refs": ["project:PRJ_PACKET_DUP_001", "document:PLACEHOLDER_SOURCE_DOCUMENT_ID"]
+}

@@ -1,0 +1,51 @@
+{
+  "project_instance_id": "PLACEHOLDER_PROJECT_INSTANCE_ID",
+  "source_document_id": "DOC_PACKET_MISSING_INDEX",
+  "provisional_status": "provisional_pending_manual_review",
+  "review_gated": true,
+  "hard_guardrail_confirmation": {
+    "quantities_extracted": false,
+    "takeoff_items_created": false,
+    "cost_outputs_created": false,
+    "pricing_records_created": false,
+    "production_rate_records_created": false,
+    "review_gated": true
+  },
+  "sheet_classifications": [
+    {
+      "sheet_id": "UNK-1",
+      "sheet_title": "Unindexed Utility Sheet",
+      "sheet_class": "unknown",
+      "confidence": 0.44,
+      "provisional_status": "provisional",
+      "trace_refs": ["sheet:UNK-1", "note:index_not_detected"]
+    }
+  ],
+  "possible_relationships": [],
+  "source_artifact_register": [
+    {
+      "artifact_id": "ART_MISS_001",
+      "artifact_type": "sheet_snippet",
+      "source_document_id": "DOC_PACKET_MISSING_INDEX",
+      "storage_ref": "synthetic://packetization/missing-index/page-2",
+      "page_range": { "start_page": 2, "end_page": 2 },
+      "provisional_status": "provisional",
+      "trace_refs": ["capture:page_2"]
+    }
+  ],
+  "manual_confirmation_flags": [
+    {
+      "flag_code": "missing_plan_index",
+      "required": true,
+      "reason": "No explicit plan index was found.",
+      "trace_refs": ["issue:missing_index"]
+    },
+    {
+      "flag_code": "low_confidence_classifications",
+      "required": true,
+      "reason": "Classification confidence below threshold.",
+      "trace_refs": ["confidence:0.44"]
+    }
+  ],
+  "trace_refs": ["document:DOC_PACKET_MISSING_INDEX"]
+}

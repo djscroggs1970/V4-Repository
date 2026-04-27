@@ -1,0 +1,61 @@
+{
+  "project_instance_id": "PRJ_PACKET_MIXED_001",
+  "source_document_id": "DOC_PACKET_MIXED_001",
+  "provisional_status": "provisional_pending_manual_review",
+  "review_gated": true,
+  "hard_guardrail_confirmation": {
+    "quantities_extracted": false,
+    "takeoff_items_created": false,
+    "cost_outputs_created": false,
+    "pricing_records_created": false,
+    "production_rate_records_created": false,
+    "review_gated": true
+  },
+  "sheet_classifications": [
+    {
+      "sheet_id": "C-41",
+      "sheet_title": "Utility Plan (Water + Sewer + Storm)",
+      "sheet_class": "plan",
+      "confidence": 0.56,
+      "provisional_status": "provisional",
+      "trace_refs": ["sheet:C-41", "note:mixed_utilities"]
+    }
+  ],
+  "possible_relationships": [
+    {
+      "relationship_id": "REL_MIXED_001",
+      "relationship_type": "references",
+      "from_sheet_id": "C-41",
+      "to_sheet_id": "D-1",
+      "confidence": 0.52,
+      "provisional_status": "provisional",
+      "trace_refs": ["note:detail_reference"]
+    }
+  ],
+  "source_artifact_register": [
+    {
+      "artifact_id": "ART_MIXED_001",
+      "artifact_type": "legend_capture",
+      "source_document_id": "DOC_PACKET_MIXED_001",
+      "storage_ref": "synthetic://packetization/mixed/legend",
+      "page_range": { "start_page": 3, "end_page": 3 },
+      "provisional_status": "provisional",
+      "trace_refs": ["capture:legend"]
+    }
+  ],
+  "manual_confirmation_flags": [
+    {
+      "flag_code": "mixed_utility_sheets",
+      "required": true,
+      "reason": "Sheet contains multiple utility scopes.",
+      "trace_refs": ["issue:mixed_utilities"]
+    },
+    {
+      "flag_code": "low_confidence_classifications",
+      "required": true,
+      "reason": "Classification confidence below threshold.",
+      "trace_refs": ["confidence:0.56"]
+    }
+  ],
+  "trace_refs": ["project:PRJ_PACKET_MIXED_001", "document:DOC_PACKET_MIXED_001"]
+}
