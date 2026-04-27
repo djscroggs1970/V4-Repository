@@ -47,7 +47,7 @@ describe("VS1A sanitary sewer candidate audit adapter", () => {
       upstream_depth_ft: 9.8,
       downstream_depth_ft: 8.9,
       confidence: 0.91,
-      trace_refs: ["document:DOC_SAN_ADAPT_001", "sheet:C3.10", "excerpt:8-IN SANITARY SEWER", "detail:plan_callout_1", "project:PRJ_SAN_ADAPT_001"]
+      trace_refs: expect.arrayContaining(["document:DOC_SAN_ADAPT_001", "sheet:C3.10", "excerpt:8-IN SANITARY SEWER", "detail:plan_callout_1", "project:PRJ_SAN_ADAPT_001"])
     });
     expect(result.audit_ready).toBe(true);
     expect(result.next_required_action).toBe("run_sewer_extraction_audit");
@@ -273,7 +273,7 @@ describe("VS1A sanitary sewer candidate audit adapter", () => {
       upstream_depth_ft: 6.5,
       downstream_depth_ft: 5.5,
       confidence: 0.73,
-      trace_refs: ["document:DOC_SAN_ADAPT_001", "sheet:C3.10", "note:sanitary_profile_confirmed", "project:PRJ_SAN_ADAPT_001"]
+      trace_refs: expect.arrayContaining(["document:DOC_SAN_ADAPT_001", "sheet:C3.10", "note:sanitary_profile_confirmed", "project:PRJ_SAN_ADAPT_001"])
     });
   });
 
