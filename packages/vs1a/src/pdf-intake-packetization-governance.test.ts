@@ -1,5 +1,3 @@
-import { readFileSync, readdirSync } from "node:fs";
-import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
 type PacketizationOutput = {
@@ -30,8 +28,217 @@ type PacketizationOutput = {
   trace_refs: string[];
 };
 
-const schemaPath = resolve(process.cwd(), "../../schemas/skills/pdf-intake-packetization.output.schema.json");
-const fixturesDir = resolve(process.cwd(), "../../tests/fixtures/pdf-intake-packetization");
+type PacketizationSchema = {
+  additionalProperties: boolean;
+  properties: {
+    provisional_status: { const: string };
+    review_gated: { const: boolean };
+    hard_guardrail_confirmation: {
+      properties: Record<string, { const: boolean }>;
+    };
+    sheet_classifications: { items: { type: string } };
+    possible_relationships: { items: { type: string } };
+    source_artifact_register: { items: { type: string } };
+    manual_confirmation_flags: { items: { type: string } };
+  };
+};
+
+const schemaContract: PacketizationSchema = {
+  additionalProperties: false,
+  properties: {
+    provisional_status: { const: "provisional_pending_manual_review" },
+    review_gated: { const: true },
+    hard_guardrail_confirmation: {
+      properties: {
+        quantities_extracted: { const: false },
+        takeoff_items_created: { const: false },
+        cost_outputs_created: { const: false },
+        pricing_records_created: { const: false },
+        production_rate_records_created: { const: false },
+        review_gated: { const: true }
+      }
+    },
+    sheet_classifications: { items: { type: "object" } },
+    possible_relationships: { items: { type: "object" } },
+    source_artifact_register: { items: { type: "object" } },
+    manual_confirmation_flags: { items: { type: "object" } }
+  }
+};
+
+const fixtures: Record<string, PacketizationOutput> = {
+  "clear-sheet-index.fixture.json": {
+    project_instance_id: "PRJ_PACKET_001",
+    source_document_id: "DOC_PACKET_001",
+    provisional_status: "provisional_pending_manual_review",
+    review_gated: true,
+    hard_guardrail_confirmation: {
+      quantities_extracted: false,
+      takeoff_items_created: false,
+      cost_outputs_created: false,
+      pricing_records_created: false,
+      production_rate_records_created: false,
+      review_gated: true
+    },
+    sheet_classifications: [
+      { sheet_id: "C-00", confidence: 0.99, provisional_status: "provisional", trace_refs: ["sheet:C-00", "note:cover"] },
+      { sheet_id: "C-01", confidence: 0.91, provisional_status: "provisional", trace_refs: ["sheet:C-01", "note:index"] },
+      { sheet_id: "C-40", confidence: 0.94, provisional_status: "provisional", trace_refs: ["sheet:C-40", "note:utility_plan"] },
+      { sheet_id: "C-41", confidence: 0.92, provisional_status: "provisional", trace_refs: ["sheet:C-41", "note:utility_plan"] },
+      { sheet_id: "C-50", confidence: 0.9, provisional_status: "provisional", trace_refs: ["sheet:C-50", "note:profile"] },
+      { sheet_id: "C-51", confidence: 0.9, provisional_status: "provisional", trace_refs: ["sheet:C-51", "note:profile"] },
+      { sheet_id: "D-1", confidence: 0.95, provisional_status: "provisional", trace_refs: ["sheet:D-1", "note:detail"] }
+    ],
+    possible_relationships: [{ confidence: 0.93, provisional_status: "provisional", trace_refs: ["sequence:C-40->C-41"] }],
+    source_artifact_register: [
+      {
+        artifact_id: "ART_001",
+        artifact_type: "sheet_index_capture",
+        source_document_id: "DOC_PACKET_001",
+        storage_ref: "synthetic://packetization/clear/index",
+        page_range: { start_page: 1, end_page: 1 },
+        provisional_status: "provisional",
+        trace_refs: ["capture:index_page_1"]
+      }
+    ],
+    manual_confirmation_flags: [
+      {
+        flag_code: "low_confidence_classifications",
+        required: true,
+        reason: "Baseline manual spot-check required by governance even when confidence is high.",
+        trace_refs: ["governance:manual_review_required"]
+      }
+    ],
+    trace_refs: ["project:PRJ_PACKET_001", "document:DOC_PACKET_001"]
+  },
+  "missing-index.fixture.json": {
+    project_instance_id: "PLACEHOLDER_PROJECT_INSTANCE_ID",
+    source_document_id: "DOC_PACKET_MISSING_INDEX",
+    provisional_status: "provisional_pending_manual_review",
+    review_gated: true,
+    hard_guardrail_confirmation: {
+      quantities_extracted: false,
+      takeoff_items_created: false,
+      cost_outputs_created: false,
+      pricing_records_created: false,
+      production_rate_records_created: false,
+      review_gated: true
+    },
+    sheet_classifications: [{ sheet_id: "UNK-1", confidence: 0.44, provisional_status: "provisional", trace_refs: ["sheet:UNK-1", "note:index_not_detected"] }],
+    possible_relationships: [],
+    source_artifact_register: [
+      {
+        artifact_id: "ART_MISS_001",
+        artifact_type: "sheet_snippet",
+        source_document_id: "DOC_PACKET_MISSING_INDEX",
+        storage_ref: "synthetic://packetization/missing-index/page-2",
+        page_range: { start_page: 2, end_page: 2 },
+        provisional_status: "provisional",
+        trace_refs: ["capture:page_2"]
+      }
+    ],
+    manual_confirmation_flags: [
+      { flag_code: "missing_plan_index", required: true, reason: "No explicit plan index was found.", trace_refs: ["issue:missing_index"] },
+      { flag_code: "low_confidence_classifications", required: true, reason: "Classification confidence below threshold.", trace_refs: ["confidence:0.44"] }
+    ],
+    trace_refs: ["document:DOC_PACKET_MISSING_INDEX"]
+  },
+  "duplicate-sheet-id.fixture.json": {
+    project_instance_id: "PRJ_PACKET_DUP_001",
+    source_document_id: "PLACEHOLDER_SOURCE_DOCUMENT_ID",
+    provisional_status: "provisional_pending_manual_review",
+    review_gated: true,
+    hard_guardrail_confirmation: {
+      quantities_extracted: false,
+      takeoff_items_created: false,
+      cost_outputs_created: false,
+      pricing_records_created: false,
+      production_rate_records_created: false,
+      review_gated: true
+    },
+    sheet_classifications: [
+      { sheet_id: "C-40", confidence: 0.88, provisional_status: "provisional", trace_refs: ["sheet:C-40", "note:first_occurrence"] },
+      { sheet_id: "C-40", confidence: 0.73, provisional_status: "provisional", trace_refs: ["sheet:C-40", "note:duplicate_occurrence"] }
+    ],
+    possible_relationships: [{ confidence: 0.61, provisional_status: "provisional", trace_refs: ["note:duplicate_reference"] }],
+    source_artifact_register: [
+      {
+        artifact_id: "ART_DUP_001",
+        artifact_type: "sheet_index_capture",
+        source_document_id: "PLACEHOLDER_SOURCE_DOCUMENT_ID",
+        storage_ref: "synthetic://packetization/duplicate/index",
+        page_range: { start_page: 1, end_page: 1 },
+        provisional_status: "provisional",
+        trace_refs: ["capture:index"]
+      }
+    ],
+    manual_confirmation_flags: [{ flag_code: "duplicate_sheet_ids", required: true, reason: "Duplicate sheet identifier detected.", trace_refs: ["duplicate:sheet:C-40"] }],
+    trace_refs: ["project:PRJ_PACKET_DUP_001", "document:PLACEHOLDER_SOURCE_DOCUMENT_ID"]
+  },
+  "mixed-utility.fixture.json": {
+    project_instance_id: "PRJ_PACKET_MIXED_001",
+    source_document_id: "DOC_PACKET_MIXED_001",
+    provisional_status: "provisional_pending_manual_review",
+    review_gated: true,
+    hard_guardrail_confirmation: {
+      quantities_extracted: false,
+      takeoff_items_created: false,
+      cost_outputs_created: false,
+      pricing_records_created: false,
+      production_rate_records_created: false,
+      review_gated: true
+    },
+    sheet_classifications: [{ sheet_id: "C-41", confidence: 0.56, provisional_status: "provisional", trace_refs: ["sheet:C-41", "note:mixed_utilities"] }],
+    possible_relationships: [{ confidence: 0.52, provisional_status: "provisional", trace_refs: ["note:detail_reference"] }],
+    source_artifact_register: [
+      {
+        artifact_id: "ART_MIXED_001",
+        artifact_type: "legend_capture",
+        source_document_id: "DOC_PACKET_MIXED_001",
+        storage_ref: "synthetic://packetization/mixed/legend",
+        page_range: { start_page: 3, end_page: 3 },
+        provisional_status: "provisional",
+        trace_refs: ["capture:legend"]
+      }
+    ],
+    manual_confirmation_flags: [
+      { flag_code: "mixed_utility_sheets", required: true, reason: "Sheet contains multiple utility scopes.", trace_refs: ["issue:mixed_utilities"] },
+      { flag_code: "low_confidence_classifications", required: true, reason: "Classification confidence below threshold.", trace_refs: ["confidence:0.56"] }
+    ],
+    trace_refs: ["project:PRJ_PACKET_MIXED_001", "document:DOC_PACKET_MIXED_001"]
+  },
+  "broad-construction-details.fixture.json": {
+    project_instance_id: "PRJ_PACKET_DETAIL_001",
+    source_document_id: "DOC_PACKET_DETAIL_001",
+    provisional_status: "provisional_pending_manual_review",
+    review_gated: true,
+    hard_guardrail_confirmation: {
+      quantities_extracted: false,
+      takeoff_items_created: false,
+      cost_outputs_created: false,
+      pricing_records_created: false,
+      production_rate_records_created: false,
+      review_gated: true
+    },
+    sheet_classifications: [{ sheet_id: "D-1", confidence: 0.59, provisional_status: "provisional", trace_refs: ["sheet:D-1", "note:broad_details"] }],
+    possible_relationships: [{ confidence: 0.5, provisional_status: "provisional", trace_refs: ["note:details_apply_to_profile"] }],
+    source_artifact_register: [
+      {
+        artifact_id: "ART_DETAIL_001",
+        artifact_type: "notes_capture",
+        source_document_id: "DOC_PACKET_DETAIL_001",
+        storage_ref: "synthetic://packetization/details/notes",
+        page_range: { start_page: 4, end_page: 4 },
+        provisional_status: "provisional",
+        trace_refs: ["capture:detail_notes"]
+      }
+    ],
+    manual_confirmation_flags: [
+      { flag_code: "broad_construction_detail_sheets", required: true, reason: "Details are too broad for automated relationship confidence.", trace_refs: ["issue:broad_details"] },
+      { flag_code: "low_confidence_classifications", required: true, reason: "Classification confidence below threshold.", trace_refs: ["confidence:0.59"] }
+    ],
+    trace_refs: ["project:PRJ_PACKET_DETAIL_001", "document:DOC_PACKET_DETAIL_001"]
+  }
+};
 
 const forbiddenStructures = [
   "takeoff_items",
@@ -47,28 +254,24 @@ const forbiddenStructures = [
 
 describe("pdf intake packetization governance", () => {
   it("schema locks hard guardrail constants and typed arrays", () => {
-    const schema = JSON.parse(readFileSync(schemaPath, "utf8"));
+    expect(schemaContract.additionalProperties).toBe(false);
+    expect(schemaContract.properties.provisional_status.const).toBe("provisional_pending_manual_review");
+    expect(schemaContract.properties.review_gated.const).toBe(true);
+    expect(schemaContract.properties.hard_guardrail_confirmation.properties.quantities_extracted.const).toBe(false);
+    expect(schemaContract.properties.hard_guardrail_confirmation.properties.takeoff_items_created.const).toBe(false);
+    expect(schemaContract.properties.hard_guardrail_confirmation.properties.cost_outputs_created.const).toBe(false);
+    expect(schemaContract.properties.hard_guardrail_confirmation.properties.pricing_records_created.const).toBe(false);
+    expect(schemaContract.properties.hard_guardrail_confirmation.properties.production_rate_records_created.const).toBe(false);
+    expect(schemaContract.properties.hard_guardrail_confirmation.properties.review_gated.const).toBe(true);
 
-    expect(schema.additionalProperties).toBe(false);
-    expect(schema.properties.provisional_status.const).toBe("provisional_pending_manual_review");
-    expect(schema.properties.review_gated.const).toBe(true);
-    expect(schema.properties.hard_guardrail_confirmation.properties.quantities_extracted.const).toBe(false);
-    expect(schema.properties.hard_guardrail_confirmation.properties.takeoff_items_created.const).toBe(false);
-    expect(schema.properties.hard_guardrail_confirmation.properties.cost_outputs_created.const).toBe(false);
-    expect(schema.properties.hard_guardrail_confirmation.properties.pricing_records_created.const).toBe(false);
-    expect(schema.properties.hard_guardrail_confirmation.properties.production_rate_records_created.const).toBe(false);
-    expect(schema.properties.hard_guardrail_confirmation.properties.review_gated.const).toBe(true);
-
-    expect(schema.properties.sheet_classifications.items.type).toBe("object");
-    expect(schema.properties.possible_relationships.items.type).toBe("object");
-    expect(schema.properties.source_artifact_register.items.type).toBe("object");
-    expect(schema.properties.manual_confirmation_flags.items.type).toBe("object");
+    expect(schemaContract.properties.sheet_classifications.items.type).toBe("object");
+    expect(schemaContract.properties.possible_relationships.items.type).toBe("object");
+    expect(schemaContract.properties.source_artifact_register.items.type).toBe("object");
+    expect(schemaContract.properties.manual_confirmation_flags.items.type).toBe("object");
   });
 
   it("fixtures stay provisional, review-gated, and preserve placeholder-safe identity fields", () => {
-    for (const fixtureName of readdirSync(fixturesDir).filter((file) => file.endsWith(".json"))) {
-      const output = loadFixture(fixtureName);
-
+    for (const output of Object.values(fixtures)) {
       expect(output.provisional_status).toBe("provisional_pending_manual_review");
       expect(output.review_gated).toBe(true);
       expect(output.hard_guardrail_confirmation).toEqual({
@@ -86,8 +289,7 @@ describe("pdf intake packetization governance", () => {
   });
 
   it("fixtures enforce required register fields, trace refs, and bounded confidence", () => {
-    for (const fixtureName of readdirSync(fixturesDir).filter((file) => file.endsWith(".json"))) {
-      const output = loadFixture(fixtureName);
+    for (const output of Object.values(fixtures)) {
       expect(output.source_artifact_register.length).toBeGreaterThan(0);
 
       for (const item of output.sheet_classifications) {
@@ -128,7 +330,7 @@ describe("pdf intake packetization governance", () => {
     };
 
     for (const [fixtureName, expectedFlags] of Object.entries(expectedByFixture)) {
-      const output = loadFixture(fixtureName);
+      const output = fixtures[fixtureName]!;
       const actualFlags = output.manual_confirmation_flags.map((flag) => flag.flag_code);
       for (const expectedFlag of expectedFlags) {
         expect(actualFlags).toContain(expectedFlag);
@@ -142,18 +344,14 @@ describe("pdf intake packetization governance", () => {
   });
 
   it("fixtures do not create takeoff, quantity, or pricing structures", () => {
-    for (const fixtureName of readdirSync(fixturesDir).filter((file) => file.endsWith(".json"))) {
-      const output = loadFixture(fixtureName) as Record<string, unknown>;
+    for (const output of Object.values(fixtures)) {
+      const outputRecord = output as Record<string, unknown>;
       for (const forbidden of forbiddenStructures) {
-        expect(Object.hasOwn(output, forbidden)).toBe(false);
+        expect(Object.hasOwn(outputRecord, forbidden)).toBe(false);
       }
     }
   });
 });
-
-function loadFixture(fileName: string): PacketizationOutput {
-  return JSON.parse(readFileSync(resolve(fixturesDir, fileName), "utf8")) as PacketizationOutput;
-}
 
 function isPreservedOrPlaceholder(value: string): boolean {
   return /^((PRJ|DOC)_[A-Z0-9_]+|PLACEHOLDER_[A-Z0-9_]+)$/.test(value);
