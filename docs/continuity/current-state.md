@@ -2,7 +2,7 @@
 
 Status: active restart snapshot  
 Last updated: 2026-04-27  
-Current verified version: `v0.1-sanitary-sewer-audit-adapter-ci-pass`
+Current verified version: `v0.1-pdf-intake-packetization-skill-governance-ci-pass`
 
 ## Purpose
 
@@ -20,16 +20,16 @@ This document is the compact restart point for future V4 Civil Estimating Platfo
 
 ## Latest verified checkpoint
 
-`v0.1-sanitary-sewer-audit-adapter-ci-pass`
+`v0.1-pdf-intake-packetization-skill-governance-ci-pass`
 
 Evidence:
 
 ```text
-PR: #21 Add sanitary sewer candidate audit adapter slice
-GitHub Actions CI run: 25022784258
+PR: #23 Add PDF intake packetization skill governance
+GitHub Actions CI run: 25024494691
 CI conclusion: success
-Merge SHA: 671316121aded27175ddefbfa77a70a64b277171
-Airtable checkpoint record: recIkQUeyzzzp2SRF
+Merge SHA: 2fcc6e0a50a99018887f7a0b7852c041f940239d
+Airtable checkpoint record: recLNY1JlVNa09RjH
 ```
 
 ## Current verified VS1A chain
@@ -77,7 +77,7 @@ VS1B is verified through vendor quote registry merge review gate.
 
 ## Current verified governance/tooling chain
 
-V4 includes a controlled Codex command lane.
+V4 includes a controlled Codex command lane and governed skill support.
 
 1. Codex can be used as a repo-bound implementation assistant.
 2. This chat remains the task controller and governance reviewer.
@@ -87,6 +87,7 @@ V4 includes a controlled Codex command lane.
 6. Codex cannot create Airtable checkpoints.
 7. CI/check evidence and human/governance review are still required before verification.
 8. If Codex cannot push/open a visible PR because of environment restrictions, the change may be recreated through the GitHub connector only after confirming changed-file scope and preserving V4 guardrails.
+9. PDF intake packetization skill governance is verified as documentation/schema/test tooling only.
 
 ## Current implementation packages
 
@@ -112,6 +113,7 @@ packages/vs1a/src/audit-candidate-handoff.ts
 packages/vs1a/src/civil-extraction-candidates.ts
 packages/vs1a/src/sanitary-sewer-extraction-candidates.ts
 packages/vs1a/src/sanitary-sewer-audit-adapter.ts
+packages/vs1a/src/pdf-intake-packetization-governance.test.ts
 packages/vs1a/src/index.test.ts
 packages/vs1a/src/plan-harvest.test.ts
 packages/vs1a/src/promenade-plan-validation.test.ts
@@ -165,6 +167,13 @@ AGENTS.md
 docs/continuity/source-of-truth.md
 docs/continuity/current-state.md
 docs/governance/production-rate-source-policy.md
+docs/skills/pdf-intake-packetization.md
+schemas/skills/pdf-intake-packetization.output.schema.json
+tests/fixtures/pdf-intake-packetization/clear-sheet-index.fixture.json
+tests/fixtures/pdf-intake-packetization/missing-index.fixture.json
+tests/fixtures/pdf-intake-packetization/duplicate-sheet-id.fixture.json
+tests/fixtures/pdf-intake-packetization/mixed-utility.fixture.json
+tests/fixtures/pdf-intake-packetization/broad-construction-details.fixture.json
 .github/workflows/ci.yml
 ```
 
@@ -269,6 +278,21 @@ The current VS1B pipeline can:
 - preserve project instance, source document, source file, vendor, quote batch, quote line, quote ID, and trace references through vendor quote registry review
 - avoid creating labor rates, equipment rates, production rates, or validated cost input registry records from the vendor quote registry review gate
 
+## Verified skill/governance behavior
+
+The PDF Intake Packetization Skill governance can:
+
+- define a provisional-only output contract for plan PDF intake packetization
+- require `provisional_status: provisional_pending_manual_review`
+- require `review_gated: true`
+- require hard guardrail confirmations that no quantities, takeoff items, costs, pricing records, or production-rate records were created
+- require fully typed `sheet_classifications`, `possible_relationships`, `source_artifact_register`, and `manual_confirmation_flags`
+- require confidence values bounded from 0 to 1
+- require trace references on applicable records
+- provide synthetic fixtures for clear index, missing index, duplicate sheet IDs, mixed utility sheets, and broad construction details
+- keep C-50/C-51 examples synthetic sheet naming examples only
+- validate governance fixtures without production OCR, real plan parsing, real project data, quantity extraction, takeoff creation, or pricing output
+
 ## Current guardrails
 
 - Chat history is not the system of record.
@@ -283,6 +307,8 @@ The current VS1B pipeline can:
 - Sanitary sewer extraction candidate builder outputs are provisional module records only.
 - Sanitary sewer extraction candidate builder outputs must remain human-review gated and must not be treated as full sewer takeoff.
 - Sanitary sewer audit adapter outputs remain provisional audit inputs only and must not bypass human review.
+- PDF intake packetization skill governance is documentation/schema/test tooling only.
+- PDF intake packetization skill outputs must remain provisional, review-gated, and non-quantity-producing.
 - Audit outputs must remain provisional and human-review gated until explicitly resolved by future governance.
 - Audit promotion gate outputs are not quantity-export-ready.
 - Promoted audit candidates must still pass takeoff review before quantity summary or export.
@@ -305,6 +331,13 @@ The VS1A sanitary utility extraction audit harness, audit review promotion gate,
 
 ```text
 @v4/vs1a
+```
+
+The V4 PDF Intake Packetization Skill governance is verified as documentation/schema/test tooling:
+
+```text
+docs/skills/pdf-intake-packetization.md
+schemas/skills/pdf-intake-packetization.output.schema.json
 ```
 
 The VS1B vendor quote intake and vendor quote registry review gate modules are verified and exposed through the VS1B root package barrel export:
@@ -387,6 +420,14 @@ Sanitary Sewer End-to-End Candidate Chain Fixture
 
 Goal: add a controlled synthetic fixture/test that proves the sanitary sewer module candidate builder, audit adapter, sewer extraction audit harness, audit review promotion gate, and audit candidate takeoff handoff can work together end-to-end without real job data, PDF intelligence, autonomous quantity export, or bypassing human review.
 
+Optional next skill lane after the sewer fixture:
+
+```text
+V4 Codex Task Builder Skill
+```
+
+Goal: add governed documentation/schema/test support for producing consistent Codex task prompts with current verified state, routing type, guardrails, required tests, CI commands, and return format.
+
 ## New session boot instruction
 
 Start future sessions with:
@@ -396,7 +437,7 @@ This is a V4 Civil Estimating Platform session.
 Use GitHub `djscroggs1970/V4-Repository`, Airtable `V4 Base`, Drive `V4 Framework`, and ClickUp `V4 Framework` as the external sources of truth.
 Read `AGENTS.md`, `docs/continuity/source-of-truth.md`, `docs/continuity/current-state.md`, and `docs/governance/production-rate-source-policy.md` before continuing.
 Codex is available as a controlled implementation assistant, but this chat remains task controller/reviewer and Codex must follow AGENTS.md.
-Current verified version: `v0.1-sanitary-sewer-audit-adapter-ci-pass`.
+Current verified version: `v0.1-pdf-intake-packetization-skill-governance-ci-pass`.
 Current goal: [one sentence].
 Do not rely on prior job data unless explicitly provided.
 Maintain job-instance isolation and no-bleed/no-drift rules.
