@@ -15,6 +15,7 @@ export { buildSewerExtractionAuditResult } from "./sewer-extraction-audit.js";
 export { buildAuditReviewPromotionGateResult } from "./audit-review-gate.js";
 export { buildAuditCandidateTakeoffHandoff } from "./audit-candidate-handoff.js";
 export { buildCivilExtractionCandidates } from "./civil-extraction-candidates.js";
+export { buildSanitarySewerExtractionCandidates } from "./sanitary-sewer-extraction-candidates.js";
 export type { TakeoffCandidateHandoffRecord, TakeoffCandidateHandoffResult } from "./audit-candidate-handoff.js";
 export type {
   BuildCivilExtractionCandidatesInput,
@@ -24,6 +25,16 @@ export type {
   CivilExtractionScope,
   CivilExtractionScopeBatchInput
 } from "./civil-extraction-candidates.js";
+export type {
+  BuildSanitarySewerExtractionCandidatesInput,
+  BuildSanitarySewerExtractionCandidatesResult,
+  SanitaryPipeRunCandidateInput,
+  SanitaryPipeRunCandidateRecord,
+  SanitaryProfileObservationCandidateInput,
+  SanitaryProfileObservationCandidateRecord,
+  SanitaryStructureCandidateInput,
+  SanitaryStructureCandidateRecord
+} from "./sanitary-sewer-extraction-candidates.js";
 export type {
   AuditReviewDecision,
   AuditReviewDecisionInput,
