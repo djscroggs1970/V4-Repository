@@ -2,7 +2,7 @@
 
 Status: active restart snapshot  
 Last updated: 2026-04-27  
-Current verified version: `v0.1-sanitary-sewer-extraction-candidate-builder-ci-pass`
+Current verified version: `v0.1-sanitary-sewer-audit-adapter-ci-pass`
 
 ## Purpose
 
@@ -20,21 +20,21 @@ This document is the compact restart point for future V4 Civil Estimating Platfo
 
 ## Latest verified checkpoint
 
-`v0.1-sanitary-sewer-extraction-candidate-builder-ci-pass`
+`v0.1-sanitary-sewer-audit-adapter-ci-pass`
 
 Evidence:
 
 ```text
-PR: #19 Add sanitary sewer extraction candidate builder
-GitHub Actions CI run: 25020693205
+PR: #21 Add sanitary sewer candidate audit adapter slice
+GitHub Actions CI run: 25022784258
 CI conclusion: success
-Merge SHA: 418e36aa89c4d6af1f7a7435d93f1b5c64598d78
-Airtable checkpoint record: recHJHg65KQwM7nWl
+Merge SHA: 671316121aded27175ddefbfa77a70a64b277171
+Airtable checkpoint record: recIkQUeyzzzp2SRF
 ```
 
 ## Current verified VS1A chain
 
-VS1A is verified through the sanitary sewer module extraction candidate builder stage.
+VS1A is verified through the sanitary sewer candidate audit adapter stage.
 
 1. Upload registration
 2. Sheet index creation
@@ -50,6 +50,7 @@ VS1A is verified through the sanitary sewer module extraction candidate builder 
 12. VS1A audit candidate handoff
 13. Shared civil extraction candidate framework
 14. Sanitary sewer module extraction candidate builder
+15. Sanitary sewer candidate audit adapter
 
 ## Current verified VS1B chain
 
@@ -110,6 +111,7 @@ packages/vs1a/src/audit-review-gate.ts
 packages/vs1a/src/audit-candidate-handoff.ts
 packages/vs1a/src/civil-extraction-candidates.ts
 packages/vs1a/src/sanitary-sewer-extraction-candidates.ts
+packages/vs1a/src/sanitary-sewer-audit-adapter.ts
 packages/vs1a/src/index.test.ts
 packages/vs1a/src/plan-harvest.test.ts
 packages/vs1a/src/promenade-plan-validation.test.ts
@@ -118,6 +120,7 @@ packages/vs1a/src/audit-review-gate.test.ts
 packages/vs1a/src/audit-candidate-handoff.test.ts
 packages/vs1a/src/civil-extraction-candidates.test.ts
 packages/vs1a/src/sanitary-sewer-extraction-candidates.test.ts
+packages/vs1a/src/sanitary-sewer-audit-adapter.test.ts
 ```
 
 Key VS1B files:
@@ -215,6 +218,14 @@ The current VS1A pipeline can:
 - reject duplicate sanitary candidate IDs, unselected sheet references, invalid confidence values, endpoint/trace-empty pipe candidates, and nonpositive pipe length or diameter when provided
 - keep sanitary sewer extraction candidates pending review, `completeness_claim: not_claimed`, and `quantity_export_ready: false`
 - avoid creating `TakeoffItem` records, quantity summaries, or quantity exports from the sanitary sewer extraction candidate builder
+- convert sanitary sewer pipe candidates into sewer extraction audit candidate inputs
+- build sanitary sewer audit drawing sheet indexes from selected sheet IDs
+- keep sanitary structure/profile candidates as skipped context rather than found pipe runs
+- preserve project, document, sheet, candidate, sanitary pipe field, confidence, and trace references through the sanitary sewer audit adapter
+- reject non-sanitary scope, duplicate audit candidate IDs, missing trace references, project/document mismatch, quantity-export-ready candidates, and invalid completeness claims in the sanitary sewer audit adapter
+- set sanitary sewer audit adapter `audit_ready` and `next_required_action` based on pipe candidate availability
+- keep sanitary sewer audit adapter output provisional with `completeness_claim: not_claimed`
+- avoid creating `TakeoffItem` records, quantity summaries, quantity exports, promotion records, or handoff records from the sanitary sewer audit adapter
 
 ## Verified VS1B behavior
 
@@ -271,6 +282,7 @@ The current VS1B pipeline can:
 - Civil extraction candidate framework outputs must remain module-scoped, human-review gated, and not quantity-export-ready.
 - Sanitary sewer extraction candidate builder outputs are provisional module records only.
 - Sanitary sewer extraction candidate builder outputs must remain human-review gated and must not be treated as full sewer takeoff.
+- Sanitary sewer audit adapter outputs remain provisional audit inputs only and must not bypass human review.
 - Audit outputs must remain provisional and human-review gated until explicitly resolved by future governance.
 - Audit promotion gate outputs are not quantity-export-ready.
 - Promoted audit candidates must still pass takeoff review before quantity summary or export.
@@ -289,7 +301,7 @@ The current VS1B pipeline can:
 
 ## Current export surface note
 
-The VS1A sanitary utility extraction audit harness, audit review promotion gate, audit candidate handoff, shared civil extraction candidate framework, and sanitary sewer extraction candidate builder are verified and exposed through the VS1A root package barrel export:
+The VS1A sanitary utility extraction audit harness, audit review promotion gate, audit candidate handoff, shared civil extraction candidate framework, sanitary sewer extraction candidate builder, and sanitary sewer candidate audit adapter are verified and exposed through the VS1A root package barrel export:
 
 ```text
 @v4/vs1a
@@ -370,10 +382,10 @@ Known Codex environment limitation:
 Recommended next slice:
 
 ```text
-Sanitary Sewer Candidate Audit Adapter
+Sanitary Sewer End-to-End Candidate Chain Fixture
 ```
 
-Goal: convert provisional sanitary sewer module extraction candidates into the existing sewer extraction audit harness input shape so they can enter the controlled audit, review, promotion, and takeoff-handoff chain without creating takeoff items, claiming complete sewer extraction, or bypassing human review.
+Goal: add a controlled synthetic fixture/test that proves the sanitary sewer module candidate builder, audit adapter, sewer extraction audit harness, audit review promotion gate, and audit candidate takeoff handoff can work together end-to-end without real job data, PDF intelligence, autonomous quantity export, or bypassing human review.
 
 ## New session boot instruction
 
@@ -384,7 +396,7 @@ This is a V4 Civil Estimating Platform session.
 Use GitHub `djscroggs1970/V4-Repository`, Airtable `V4 Base`, Drive `V4 Framework`, and ClickUp `V4 Framework` as the external sources of truth.
 Read `AGENTS.md`, `docs/continuity/source-of-truth.md`, `docs/continuity/current-state.md`, and `docs/governance/production-rate-source-policy.md` before continuing.
 Codex is available as a controlled implementation assistant, but this chat remains task controller/reviewer and Codex must follow AGENTS.md.
-Current verified version: `v0.1-sanitary-sewer-extraction-candidate-builder-ci-pass`.
+Current verified version: `v0.1-sanitary-sewer-audit-adapter-ci-pass`.
 Current goal: [one sentence].
 Do not rely on prior job data unless explicitly provided.
 Maintain job-instance isolation and no-bleed/no-drift rules.
