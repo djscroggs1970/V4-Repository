@@ -2,7 +2,7 @@
 
 Status: active restart snapshot  
 Last updated: 2026-04-27  
-Current verified version: `v0.1-audit-candidate-handoff-ci-pass`
+Current verified version: `v0.1-vendor-quote-registry-review-gate-ci-pass`
 
 ## Purpose
 
@@ -20,16 +20,16 @@ This document is the compact restart point for future V4 Civil Estimating Platfo
 
 ## Latest verified checkpoint
 
-`v0.1-audit-candidate-handoff-ci-pass`
+`v0.1-vendor-quote-registry-review-gate-ci-pass`
 
 Evidence:
 
 ```text
-PR: #13 Add VS1A audit candidate handoff
-GitHub Actions CI run: 24970637314
+PR: #15 Add vendor quote registry review gate
+GitHub Actions CI run: 24971433669
 CI conclusion: success
-Merge SHA: 5248f175e28e3bd300881a7a3bbce4b8248a0b0e
-Airtable checkpoint record: recvlhMWhL9IM07zn
+Merge SHA: e8f101e09264f4598a579334a85316a0c92595e6
+Airtable checkpoint record: recNp2uCusQ0WqbHY
 ```
 
 ## Current verified VS1A chain
@@ -51,7 +51,7 @@ VS1A is verified through the audit candidate handoff stage.
 
 ## Current verified VS1B chain
 
-VS1B is verified through vendor quote intake / normalized pricing schema.
+VS1B is verified through vendor quote registry merge review gate.
 
 1. Initial cost buildout from approved quantity exports
 2. Cost input registry
@@ -70,6 +70,7 @@ VS1B is verified through vendor quote intake / normalized pricing schema.
 15. Delivery persistence / external transmission gate
 16. Controlled transmission adapter boundary
 17. Vendor quote intake / normalized pricing schema
+18. Vendor quote registry merge review gate
 
 ## Current verified governance/tooling chain
 
@@ -133,6 +134,7 @@ packages/vs1b/src/delivery-manifest.ts
 packages/vs1b/src/delivery-transmission-gate.ts
 packages/vs1b/src/controlled-adapter-boundary.ts
 packages/vs1b/src/vendor-quote-intake.ts
+packages/vs1b/src/vendor-quote-registry-review-gate.ts
 packages/vs1b/src/index.test.ts
 packages/vs1b/src/estimate-package-persistence.test.ts
 packages/vs1b/src/bid-grade-release-gate.test.ts
@@ -144,6 +146,7 @@ packages/vs1b/src/delivery-manifest.test.ts
 packages/vs1b/src/delivery-transmission-gate.test.ts
 packages/vs1b/src/controlled-adapter-boundary.test.ts
 packages/vs1b/src/vendor-quote-intake.test.ts
+packages/vs1b/src/vendor-quote-registry-review-gate.test.ts
 ```
 
 Key governance/tooling files:
@@ -223,6 +226,16 @@ The current VS1B pipeline can:
 - preserve vendor quote batch, project instance, source document, source file, vendor, quote-line, and normalized quote trace references
 - keep normalized vendor quote records pending registry review and not automatically merged into the validated cost input registry
 - reject duplicate quote line IDs, missing quote identity fields, invalid material/diameter/uom/unit-cost fields, unsupported currency, and non-upload source origins
+- review normalized vendor quote records before registry merge
+- support approved, rejected, and needs-review vendor quote registry decisions
+- require reviewer identity for every vendor quote registry review row
+- require notes for rejected or needs-review vendor quote registry decisions
+- reject duplicate or unknown vendor quote registry review rows
+- keep unreviewed and needs-review vendor quotes open and not merge-ready
+- block rejected vendor quotes from registry merge
+- allow only approved normalized quote records to become eligible for registry merge
+- preserve project instance, source document, source file, vendor, quote batch, quote line, quote ID, and trace references through vendor quote registry review
+- avoid creating labor rates, equipment rates, production rates, or validated cost input registry records from the vendor quote registry review gate
 
 ## Current guardrails
 
@@ -241,7 +254,8 @@ The current VS1B pipeline can:
 - Placeholder production rates may exist in tests but must be blocked from estimate output.
 - Vendor quote intake may normalize only user-provided quote data and must not invent unit costs or vendor assumptions.
 - Normalized vendor quote records must remain pending registry review before they can feed validated cost input registries.
-- Labor rates, equipment rates, and production rates must not be created from vendor quote intake unless a future explicit slice and review workflow allows it.
+- Vendor quote registry review may make approved quote records eligible for registry merge only; it must not create a validated cost input registry by itself.
+- Labor rates, equipment rates, and production rates must not be created from vendor quote intake or vendor quote registry review unless a future explicit slice and review workflow allows it.
 - Estimate packages are for controlled human review, not autonomous bid submission.
 - Generated output documents, client-facing export packages, delivery manifests, and adapter-boundary records do not transmit, upload, email, or externally distribute files.
 - Controlled adapter-boundary records must keep execution disabled until governance explicitly enables it.
@@ -256,10 +270,15 @@ The VS1A sanitary utility extraction audit harness, audit review promotion gate,
 @v4/vs1a
 ```
 
-The VS1B vendor quote intake module is verified and exposed through both the VS1B root package barrel export and package subpath export:
+The VS1B vendor quote intake and vendor quote registry review gate modules are verified and exposed through the VS1B root package barrel export:
 
 ```text
 @v4/vs1b
+```
+
+The VS1B vendor quote intake module is also exposed through package subpath export:
+
+```text
 @v4/vs1b/vendor-quote-intake
 ```
 
@@ -326,10 +345,10 @@ Known Codex environment limitation:
 Recommended next slice:
 
 ```text
-Vendor Quote Registry Merge Review Gate
+Approved Vendor Quote Registry Merge
 ```
 
-Goal: review normalized vendor quote records and allow only approved quote records to merge into the validated cost input registry without inventing pricing or bypassing traceability.
+Goal: merge approved vendor quote records into a controlled cost input registry update path without inventing labor, equipment, production rates, or bypassing registry validation.
 
 ## New session boot instruction
 
@@ -340,7 +359,7 @@ This is a V4 Civil Estimating Platform session.
 Use GitHub `djscroggs1970/V4-Repository`, Airtable `V4 Base`, Drive `V4 Framework`, and ClickUp `V4 Framework` as the external sources of truth.
 Read `AGENTS.md`, `docs/continuity/source-of-truth.md`, `docs/continuity/current-state.md`, and `docs/governance/production-rate-source-policy.md` before continuing.
 Codex is available as a controlled implementation assistant, but this chat remains task controller/reviewer and Codex must follow AGENTS.md.
-Current verified version: `v0.1-audit-candidate-handoff-ci-pass`.
+Current verified version: `v0.1-vendor-quote-registry-review-gate-ci-pass`.
 Current goal: [one sentence].
 Do not rely on prior job data unless explicitly provided.
 Maintain job-instance isolation and no-bleed/no-drift rules.
