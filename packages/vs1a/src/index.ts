@@ -13,6 +13,8 @@ export { buildPlanHarvestSandboxResult } from "./plan-harvest.js";
 export type { HarvestedSanitaryRunInput, PlanHarvestProvenanceRecord, PlanHarvestSandboxResult } from "./plan-harvest.js";
 export { buildSewerExtractionAuditResult } from "./sewer-extraction-audit.js";
 export { buildAuditReviewPromotionGateResult } from "./audit-review-gate.js";
+export { buildAuditCandidateTakeoffHandoff } from "./audit-candidate-handoff.js";
+export type { TakeoffCandidateHandoffRecord, TakeoffCandidateHandoffResult } from "./audit-candidate-handoff.js";
 export type {
   AuditReviewDecision,
   AuditReviewDecisionInput,
