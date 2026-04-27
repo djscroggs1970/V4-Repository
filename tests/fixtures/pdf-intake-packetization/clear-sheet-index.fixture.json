@@ -1,0 +1,103 @@
+{
+  "project_instance_id": "PRJ_PACKET_001",
+  "source_document_id": "DOC_PACKET_001",
+  "provisional_status": "provisional_pending_manual_review",
+  "review_gated": true,
+  "hard_guardrail_confirmation": {
+    "quantities_extracted": false,
+    "takeoff_items_created": false,
+    "cost_outputs_created": false,
+    "pricing_records_created": false,
+    "production_rate_records_created": false,
+    "review_gated": true
+  },
+  "sheet_classifications": [
+    {
+      "sheet_id": "C-00",
+      "sheet_title": "Cover",
+      "sheet_class": "cover",
+      "confidence": 0.99,
+      "provisional_status": "provisional",
+      "trace_refs": ["sheet:C-00", "note:cover"]
+    },
+    {
+      "sheet_id": "C-01",
+      "sheet_title": "General Notes",
+      "sheet_class": "index",
+      "confidence": 0.91,
+      "provisional_status": "provisional",
+      "trace_refs": ["sheet:C-01", "note:index"]
+    },
+    {
+      "sheet_id": "C-40",
+      "sheet_title": "Utility Plan A",
+      "sheet_class": "plan",
+      "confidence": 0.94,
+      "provisional_status": "provisional",
+      "trace_refs": ["sheet:C-40", "note:utility_plan"]
+    },
+    {
+      "sheet_id": "C-41",
+      "sheet_title": "Utility Plan B",
+      "sheet_class": "plan",
+      "confidence": 0.92,
+      "provisional_status": "provisional",
+      "trace_refs": ["sheet:C-41", "note:utility_plan"]
+    },
+    {
+      "sheet_id": "C-50",
+      "sheet_title": "Plan and Profile A",
+      "sheet_class": "profile",
+      "confidence": 0.9,
+      "provisional_status": "provisional",
+      "trace_refs": ["sheet:C-50", "note:profile"]
+    },
+    {
+      "sheet_id": "C-51",
+      "sheet_title": "Plan and Profile B",
+      "sheet_class": "profile",
+      "confidence": 0.9,
+      "provisional_status": "provisional",
+      "trace_refs": ["sheet:C-51", "note:profile"]
+    },
+    {
+      "sheet_id": "D-1",
+      "sheet_title": "Construction Details",
+      "sheet_class": "detail",
+      "confidence": 0.95,
+      "provisional_status": "provisional",
+      "trace_refs": ["sheet:D-1", "note:detail"]
+    }
+  ],
+  "possible_relationships": [
+    {
+      "relationship_id": "REL_001",
+      "relationship_type": "sheet_sequence",
+      "from_sheet_id": "C-40",
+      "to_sheet_id": "C-41",
+      "confidence": 0.93,
+      "provisional_status": "provisional",
+      "trace_refs": ["sequence:C-40->C-41"]
+    }
+  ],
+  "source_artifact_register": [
+    {
+      "artifact_id": "ART_001",
+      "artifact_type": "sheet_index_capture",
+      "source_document_id": "DOC_PACKET_001",
+      "storage_ref": "synthetic://packetization/clear/index",
+      "page_range": { "start_page": 1, "end_page": 1 },
+      "provisional_status": "provisional",
+      "trace_refs": ["capture:index_page_1"]
+    }
+  ],
+  "manual_confirmation_flags": [
+    {
+      "flag_code": "low_confidence_classifications",
+      "required": true,
+      "reason": "Baseline manual spot-check required by governance even when confidence is high.",
+      "trace_refs": ["governance:manual_review_required"]
+    }
+  ],
+  "trace_refs": ["project:PRJ_PACKET_001", "document:DOC_PACKET_001"]
+}
