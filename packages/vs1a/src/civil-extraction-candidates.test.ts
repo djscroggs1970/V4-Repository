@@ -123,6 +123,34 @@ describe("VS1A shared civil extraction candidate framework", () => {
     })).toThrow("selected_sheet_ids_required");
   });
 
+  it("rejects missing project and document identity", () => {
+    expect(() => buildCivilExtractionCandidates({
+      project_instance_id: "",
+      source_document_id: "DOC_001",
+      selected_sheet_ids: ["SHEET_1"],
+      scope_batches: []
+    })).toThrow("project_instance_id_required");
+
+    expect(() => buildCivilExtractionCandidates({
+      project_instance_id: "PRJ_001",
+      source_document_id: "",
+      selected_sheet_ids: ["SHEET_1"],
+      scope_batches: []
+    })).toThrow("source_document_id_required");
+  });
+
+  it("rejects unsupported extraction scopes", () => {
+    expect(() => buildCivilExtractionCandidates({
+      project_instance_id: "PRJ_001",
+      source_document_id: "DOC_001",
+      selected_sheet_ids: ["SHEET_1"],
+      scope_batches: [{
+        extraction_scope: "landscape" as never,
+        candidates: []
+      }]
+    })).toThrow("unsupported_extraction_scope");
+  });
+
   it("rejects invalid confidence", () => {
     expect(() => buildCivilExtractionCandidates({
       project_instance_id: "PRJ_001",
