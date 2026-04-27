@@ -1,8 +1,8 @@
 # V4 Current State
 
 Status: active restart snapshot  
-Last updated: 2026-04-26  
-Current verified version: `v0.1-vendor-quote-intake-ci-pass`
+Last updated: 2026-04-27  
+Current verified version: `v0.1-audit-candidate-handoff-ci-pass`
 
 ## Purpose
 
@@ -20,21 +20,21 @@ This document is the compact restart point for future V4 Civil Estimating Platfo
 
 ## Latest verified checkpoint
 
-`v0.1-vendor-quote-intake-ci-pass`
+`v0.1-audit-candidate-handoff-ci-pass`
 
 Evidence:
 
 ```text
-PR: #12 Add vendor quote intake normalization
-PR head SHA: d35a0f4f303b14185685679d80c23d8492b18e5a
-GitHub Actions CI run: 24969955061
+PR: #13 Add VS1A audit candidate handoff
+GitHub Actions CI run: 24970637314
 CI conclusion: success
-Merge SHA: 87620447c29a220c9494f58e806171db027f0d23
+Merge SHA: 5248f175e28e3bd300881a7a3bbce4b8248a0b0e
+Airtable checkpoint record: recvlhMWhL9IM07zn
 ```
 
 ## Current verified VS1A chain
 
-VS1A is verified through the audit review / candidate promotion gate.
+VS1A is verified through the audit candidate handoff stage.
 
 1. Upload registration
 2. Sheet index creation
@@ -47,6 +47,7 @@ VS1A is verified through the audit review / candidate promotion gate.
 9. Plan harvest sandbox with review/export gates
 10. Utility extraction completeness audit harness for sanitary scope
 11. Audit review / candidate promotion gate
+12. VS1A audit candidate handoff
 
 ## Current verified VS1B chain
 
@@ -81,7 +82,7 @@ V4 includes a controlled Codex command lane.
 5. Codex may create repo-scoped branches/PRs, but it cannot mark slices verified.
 6. Codex cannot create Airtable checkpoints.
 7. CI evidence and human/governance review are still required before verification.
-8. If Codex cannot push/open a PR because of environment restrictions, the change may be recreated through the GitHub connector only after the changed-file scope is verified.
+8. If Codex cannot push/open a PR because of environment restrictions, the change may be recreated through the GitHub connector only after confirming changed-file scope and preserving V4 guardrails.
 
 ## Current implementation packages
 
@@ -103,11 +104,13 @@ packages/vs1a/src/export-persistence.ts
 packages/vs1a/src/plan-harvest.ts
 packages/vs1a/src/sewer-extraction-audit.ts
 packages/vs1a/src/audit-review-gate.ts
+packages/vs1a/src/audit-candidate-handoff.ts
 packages/vs1a/src/index.test.ts
 packages/vs1a/src/plan-harvest.test.ts
 packages/vs1a/src/promenade-plan-validation.test.ts
 packages/vs1a/src/sewer-extraction-audit.test.ts
 packages/vs1a/src/audit-review-gate.test.ts
+packages/vs1a/src/audit-candidate-handoff.test.ts
 ```
 
 Key VS1B files:
@@ -179,6 +182,15 @@ The current VS1A pipeline can:
 - require human review for every extraction audit record
 - allow only approved found-run audit records with required handoff fields to become eligible for takeoff review
 - keep promoted audit candidates pending takeoff review and not quantity-export-ready
+- convert completed audit promotion gate output into controlled pending `TakeoffItem` records
+- require completed audit review promotion gate status before handoff
+- block open audit review gates with `audit_handoff_requires_completed_gate`
+- validate eligible promoted candidate state and required handoff fields
+- preserve audit, audit-record, candidate, project, document, and sheet trace references on the handoff manifest/result
+- avoid mutating `TakeoffItem` with trace references
+- keep generated takeoff items pending review
+- keep handoff output `quantity_export_ready: false`
+- avoid summarizing quantities or creating quantity exports from handoff output
 
 ## Verified VS1B behavior
 
@@ -224,6 +236,7 @@ The current VS1B pipeline can:
 - Audit outputs must remain provisional and human-review gated until explicitly resolved by future governance.
 - Audit promotion gate outputs are not quantity-export-ready.
 - Promoted audit candidates must still pass takeoff review before quantity summary or export.
+- Audit handoff outputs still require takeoff review before quantity summary/export.
 - Cost scenarios may consume only approved quantity exports and validated cost input registries.
 - Placeholder production rates may exist in tests but must be blocked from estimate output.
 - Vendor quote intake may normalize only user-provided quote data and must not invent unit costs or vendor assumptions.
@@ -237,7 +250,7 @@ The current VS1B pipeline can:
 
 ## Current export surface note
 
-The VS1A sanitary utility extraction audit harness and audit review promotion gate are verified and exposed through the VS1A root package barrel export:
+The VS1A sanitary utility extraction audit harness, audit review promotion gate, and audit candidate handoff are verified and exposed through the VS1A root package barrel export:
 
 ```text
 @v4/vs1a
@@ -313,16 +326,6 @@ Known Codex environment limitation:
 Recommended next slice:
 
 ```text
-Promoted Audit Candidate to Takeoff Candidate Handoff
-```
-
-Goal: convert promotion-gate eligible records into controlled takeoff candidate inputs that still require the existing takeoff review workflow before quantity summary/export.
-
-Important boundary: this slice must not claim complete sewer extraction, must not bypass takeoff review, and must not make promoted audit candidates quantity-export-ready.
-
-After that, the likely pricing-side slice is:
-
-```text
 Vendor Quote Registry Merge Review Gate
 ```
 
@@ -337,7 +340,7 @@ This is a V4 Civil Estimating Platform session.
 Use GitHub `djscroggs1970/V4-Repository`, Airtable `V4 Base`, Drive `V4 Framework`, and ClickUp `V4 Framework` as the external sources of truth.
 Read `AGENTS.md`, `docs/continuity/source-of-truth.md`, `docs/continuity/current-state.md`, and `docs/governance/production-rate-source-policy.md` before continuing.
 Codex is available as a controlled implementation assistant, but this chat remains task controller/reviewer and Codex must follow AGENTS.md.
-Current verified version: `v0.1-vendor-quote-intake-ci-pass`.
+Current verified version: `v0.1-audit-candidate-handoff-ci-pass`.
 Current goal: [one sentence].
 Do not rely on prior job data unless explicitly provided.
 Maintain job-instance isolation and no-bleed/no-drift rules.
