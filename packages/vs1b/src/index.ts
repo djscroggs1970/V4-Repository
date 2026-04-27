@@ -4,6 +4,18 @@ import type { QuantityExportObject, QuantitySummaryLine } from "@v4/vs1a";
 export { buildCostInputRegistry } from "./cost-input-registry.js";
 export type { CostInputRegistry, CostInputRegistryInput } from "./cost-input-registry.js";
 export { normalizeVendorQuoteIntake } from "./vendor-quote-intake.js";
+export { buildVendorQuoteRegistryReviewGateResult } from "./vendor-quote-registry-review-gate.js";
+export type {
+  ApprovedVendorQuoteForRegistryMerge,
+  BlockedVendorQuoteRecord,
+  VendorQuoteRegistryNextAction,
+  VendorQuoteRegistryReviewCounts,
+  VendorQuoteRegistryReviewDecision,
+  VendorQuoteRegistryReviewGateInput,
+  VendorQuoteRegistryReviewGateResult,
+  VendorQuoteRegistryReviewRow,
+  VendorQuoteRegistryReviewStatus
+} from "./vendor-quote-registry-review-gate.js";
 export type {
   NormalizedVendorQuoteLine,
   VendorQuoteIntakeInput,
