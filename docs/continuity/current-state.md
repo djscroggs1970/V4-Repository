@@ -2,7 +2,7 @@
 
 Status: active restart snapshot  
 Last updated: 2026-04-27  
-Current verified version: `v0.1-vendor-quote-registry-review-gate-ci-pass`
+Current verified version: `v0.1-civil-extraction-candidate-framework-ci-pass`
 
 ## Purpose
 
@@ -20,21 +20,20 @@ This document is the compact restart point for future V4 Civil Estimating Platfo
 
 ## Latest verified checkpoint
 
-`v0.1-vendor-quote-registry-review-gate-ci-pass`
+`v0.1-civil-extraction-candidate-framework-ci-pass`
 
 Evidence:
 
 ```text
-PR: #15 Add vendor quote registry review gate
-GitHub Actions CI run: 24971433669
-CI conclusion: success
-Merge SHA: e8f101e09264f4598a579334a85316a0c92595e6
-Airtable checkpoint record: recNp2uCusQ0WqbHY
+PR: #17 Add shared civil extraction candidate framework
+GitHub PR checks: visually confirmed ready to merge in GitHub UI
+Merge SHA: a5347488aeee7cd7e7e8fc2d35468950ee891d9d
+Airtable checkpoint record: recbTRFuBy8aJ7H5O
 ```
 
 ## Current verified VS1A chain
 
-VS1A is verified through the audit candidate handoff stage.
+VS1A is verified through the shared civil extraction candidate framework stage.
 
 1. Upload registration
 2. Sheet index creation
@@ -48,6 +47,7 @@ VS1A is verified through the audit candidate handoff stage.
 10. Utility extraction completeness audit harness for sanitary scope
 11. Audit review / candidate promotion gate
 12. VS1A audit candidate handoff
+13. Shared civil extraction candidate framework
 
 ## Current verified VS1B chain
 
@@ -82,8 +82,8 @@ V4 includes a controlled Codex command lane.
 4. Codex must follow root `AGENTS.md`.
 5. Codex may create repo-scoped branches/PRs, but it cannot mark slices verified.
 6. Codex cannot create Airtable checkpoints.
-7. CI evidence and human/governance review are still required before verification.
-8. If Codex cannot push/open a PR because of environment restrictions, the change may be recreated through the GitHub connector only after confirming changed-file scope and preserving V4 guardrails.
+7. CI/check evidence and human/governance review are still required before verification.
+8. If Codex cannot push/open a visible PR because of environment restrictions, the change may be recreated through the GitHub connector only after confirming changed-file scope and preserving V4 guardrails.
 
 ## Current implementation packages
 
@@ -106,12 +106,14 @@ packages/vs1a/src/plan-harvest.ts
 packages/vs1a/src/sewer-extraction-audit.ts
 packages/vs1a/src/audit-review-gate.ts
 packages/vs1a/src/audit-candidate-handoff.ts
+packages/vs1a/src/civil-extraction-candidates.ts
 packages/vs1a/src/index.test.ts
 packages/vs1a/src/plan-harvest.test.ts
 packages/vs1a/src/promenade-plan-validation.test.ts
 packages/vs1a/src/sewer-extraction-audit.test.ts
 packages/vs1a/src/audit-review-gate.test.ts
 packages/vs1a/src/audit-candidate-handoff.test.ts
+packages/vs1a/src/civil-extraction-candidates.test.ts
 ```
 
 Key VS1B files:
@@ -194,6 +196,14 @@ The current VS1A pipeline can:
 - keep generated takeoff items pending review
 - keep handoff output `quantity_export_ready: false`
 - avoid summarizing quantities or creating quantity exports from handoff output
+- create shared civil extraction candidate records for supported civil scopes
+- support `sanitary_sewer`, `storm_drainage`, `water`, `paving_concrete`, `erosion_control`, and `earthwork_agtek_handoff` extraction scopes
+- keep shared civil extraction candidates module-scoped and project-scoped
+- preserve project, document, sheet, and candidate trace references for shared civil extraction candidates
+- enforce selected-sheet boundaries for shared civil extraction candidates
+- reject duplicate candidate IDs, unsupported scopes, missing identity fields, and invalid confidence values
+- keep shared civil extraction candidates `review_status: pending`, `completeness_claim: not_claimed`, and `quantity_export_ready: false`
+- avoid creating `TakeoffItem` records from the shared civil extraction candidate framework
 
 ## Verified VS1B behavior
 
@@ -246,6 +256,8 @@ The current VS1B pipeline can:
 - Framework, sandbox, and project data must remain separated.
 - Only approved reviewed takeoff items can feed quantity summary or export.
 - Extraction audit harnesses are not complete extraction claims.
+- Civil extraction candidate framework outputs are provisional candidate records only.
+- Civil extraction candidate framework outputs must remain module-scoped, human-review gated, and not quantity-export-ready.
 - Audit outputs must remain provisional and human-review gated until explicitly resolved by future governance.
 - Audit promotion gate outputs are not quantity-export-ready.
 - Promoted audit candidates must still pass takeoff review before quantity summary or export.
@@ -259,12 +271,12 @@ The current VS1B pipeline can:
 - Estimate packages are for controlled human review, not autonomous bid submission.
 - Generated output documents, client-facing export packages, delivery manifests, and adapter-boundary records do not transmit, upload, email, or externally distribute files.
 - Controlled adapter-boundary records must keep execution disabled until governance explicitly enables it.
-- Codex must follow `AGENTS.md` and cannot mark anything verified without CI evidence.
-- CI must pass before a slice is marked verified.
+- Codex must follow `AGENTS.md` and cannot mark anything verified without CI/check evidence.
+- CI/checks must pass before a slice is marked verified.
 
 ## Current export surface note
 
-The VS1A sanitary utility extraction audit harness, audit review promotion gate, and audit candidate handoff are verified and exposed through the VS1A root package barrel export:
+The VS1A sanitary utility extraction audit harness, audit review promotion gate, audit candidate handoff, and shared civil extraction candidate framework are verified and exposed through the VS1A root package barrel export:
 
 ```text
 @v4/vs1a
@@ -332,8 +344,8 @@ Rules:
 - Give Codex narrow repo-scoped tasks only.
 - Do not ask Codex to “build V4”, “extract the plans”, or “make it bid-grade”.
 - Prefer deterministic schema, fixture, test, CI, and documentation tasks.
-- Codex-created PRs still require CI and governance review.
-- Codex local environment failures must be distinguished from GitHub Actions CI results.
+- Codex-created PRs still require CI/checks and governance review.
+- Codex local environment failures must be distinguished from GitHub Actions CI/check results.
 
 Known Codex environment limitation:
 
@@ -345,10 +357,10 @@ Known Codex environment limitation:
 Recommended next slice:
 
 ```text
-Approved Vendor Quote Registry Merge
+Sanitary Sewer Module Extraction Candidate Builder
 ```
 
-Goal: merge approved vendor quote records into a controlled cost input registry update path without inventing labor, equipment, production rates, or bypassing registry validation.
+Goal: add the first module-specific extraction builder on top of the shared civil extraction candidate framework. It should create provisional sanitary sewer pipe, structure, and profile candidate records from structured inputs, keep them review-gated, preserve plan/profile trace references, and avoid claiming full sewer takeoff or creating `TakeoffItem` records.
 
 ## New session boot instruction
 
@@ -359,7 +371,7 @@ This is a V4 Civil Estimating Platform session.
 Use GitHub `djscroggs1970/V4-Repository`, Airtable `V4 Base`, Drive `V4 Framework`, and ClickUp `V4 Framework` as the external sources of truth.
 Read `AGENTS.md`, `docs/continuity/source-of-truth.md`, `docs/continuity/current-state.md`, and `docs/governance/production-rate-source-policy.md` before continuing.
 Codex is available as a controlled implementation assistant, but this chat remains task controller/reviewer and Codex must follow AGENTS.md.
-Current verified version: `v0.1-vendor-quote-registry-review-gate-ci-pass`.
+Current verified version: `v0.1-civil-extraction-candidate-framework-ci-pass`.
 Current goal: [one sentence].
 Do not rely on prior job data unless explicitly provided.
 Maintain job-instance isolation and no-bleed/no-drift rules.
