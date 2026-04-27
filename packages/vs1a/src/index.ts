@@ -14,7 +14,16 @@ export type { HarvestedSanitaryRunInput, PlanHarvestProvenanceRecord, PlanHarves
 export { buildSewerExtractionAuditResult } from "./sewer-extraction-audit.js";
 export { buildAuditReviewPromotionGateResult } from "./audit-review-gate.js";
 export { buildAuditCandidateTakeoffHandoff } from "./audit-candidate-handoff.js";
+export { buildCivilExtractionCandidates } from "./civil-extraction-candidates.js";
 export type { TakeoffCandidateHandoffRecord, TakeoffCandidateHandoffResult } from "./audit-candidate-handoff.js";
+export type {
+  BuildCivilExtractionCandidatesInput,
+  BuildCivilExtractionCandidatesResult,
+  CivilExtractionCandidateInput,
+  CivilExtractionCandidateRecord,
+  CivilExtractionScope,
+  CivilExtractionScopeBatchInput
+} from "./civil-extraction-candidates.js";
 export type {
   AuditReviewDecision,
   AuditReviewDecisionInput,
