@@ -2,7 +2,7 @@
 
 Status: active restart snapshot  
 Last updated: 2026-04-27  
-Current verified version: `v0.1-pdf-intake-packetization-skill-governance-ci-pass`
+Current verified version: `v0.1-codex-task-builder-skill-governance-ci-pass`
 
 ## Purpose
 
@@ -20,16 +20,16 @@ This document is the compact restart point for future V4 Civil Estimating Platfo
 
 ## Latest verified checkpoint
 
-`v0.1-pdf-intake-packetization-skill-governance-ci-pass`
+`v0.1-codex-task-builder-skill-governance-ci-pass`
 
 Evidence:
 
 ```text
-PR: #23 Add PDF intake packetization skill governance
-GitHub Actions CI run: 25024494691
+PR: #25 Add Codex task builder skill governance
+GitHub Actions CI run: 25030135344
 CI conclusion: success
-Merge SHA: 2fcc6e0a50a99018887f7a0b7852c041f940239d
-Airtable checkpoint record: recLNY1JlVNa09RjH
+Merge SHA: f1667650ea99b2704ed9da2100b50c117fa6ec1b
+Airtable checkpoint record: recqCnrkTp8fRfT3I
 ```
 
 ## Current verified VS1A chain
@@ -64,7 +64,7 @@ VS1B is verified through vendor quote registry merge review gate.
 6. Estimate package output for controlled human review
 7. Estimate package persistence record
 8. Human review workflow for approve / reject / needs-review decisions
-9. Bid-grade output release gate
+9. Bid-grade release gate
 10. Output document generation
 11. Output document persistence and review
 12. Client-facing export package assembly
@@ -88,6 +88,7 @@ V4 includes a controlled Codex command lane and governed skill support.
 7. CI/check evidence and human/governance review are still required before verification.
 8. If Codex cannot push/open a visible PR because of environment restrictions, the change may be recreated through the GitHub connector only after confirming changed-file scope and preserving V4 guardrails.
 9. PDF intake packetization skill governance is verified as documentation/schema/test tooling only.
+10. Codex task builder skill governance is verified as documentation/schema/test tooling only.
 
 ## Current implementation packages
 
@@ -114,6 +115,7 @@ packages/vs1a/src/civil-extraction-candidates.ts
 packages/vs1a/src/sanitary-sewer-extraction-candidates.ts
 packages/vs1a/src/sanitary-sewer-audit-adapter.ts
 packages/vs1a/src/pdf-intake-packetization-governance.test.ts
+packages/vs1a/src/codex-task-builder-governance.test.ts
 packages/vs1a/src/index.test.ts
 packages/vs1a/src/plan-harvest.test.ts
 packages/vs1a/src/promenade-plan-validation.test.ts
@@ -168,12 +170,19 @@ docs/continuity/source-of-truth.md
 docs/continuity/current-state.md
 docs/governance/production-rate-source-policy.md
 docs/skills/pdf-intake-packetization.md
+docs/skills/codex-task-builder.md
 schemas/skills/pdf-intake-packetization.output.schema.json
+schemas/skills/codex-task-builder.output.schema.json
 tests/fixtures/pdf-intake-packetization/clear-sheet-index.fixture.json
 tests/fixtures/pdf-intake-packetization/missing-index.fixture.json
 tests/fixtures/pdf-intake-packetization/duplicate-sheet-id.fixture.json
 tests/fixtures/pdf-intake-packetization/mixed-utility.fixture.json
 tests/fixtures/pdf-intake-packetization/broad-construction-details.fixture.json
+tests/fixtures/codex-task-builder/new-task.fixture.json
+tests/fixtures/codex-task-builder/same-task.fixture.json
+tests/fixtures/codex-task-builder/fix-current-pr.fixture.json
+tests/fixtures/codex-task-builder/verify-report-only.fixture.json
+tests/fixtures/codex-task-builder/manual-confirmation-required.fixture.json
 .github/workflows/ci.yml
 ```
 
@@ -293,6 +302,15 @@ The PDF Intake Packetization Skill governance can:
 - keep C-50/C-51 examples synthetic sheet naming examples only
 - validate governance fixtures without production OCR, real plan parsing, real project data, quantity extraction, takeoff creation, or pricing output
 
+The Codex Task Builder Skill governance can:
+
+- define governed output for Codex task prompt creation
+- support routing for `NEW TASK`, `SAME TASK`, `FIX CURRENT PR`, and `VERIFY / REPORT ONLY`
+- support task classes for new repo slices, PR fixes, local-only Codex result recreation, docs-only continuity updates, schema/test/governance fixture slices, verification-only requests, review/checkpoint preparation, and skill governance documentation slices
+- require routing reason, provisional status, review gating, hard guardrails, CI command sequence, Codex return format, governance instructions, and non-empty trace references
+- require manual confirmation for vague goals, real job data, PDF intelligence, quantities or costs, Airtable governance changes, current-state changes, multiple-module work, external credentials/apps, combined oversized slices, and checkpoint/mark-verified requests
+- remain documentation/schema/test tooling only, without production automation, Codex runtime-calling code, Airtable writes, direct repo merge action authority, verified-state claims, full PDF intelligence, real project data, quantities, takeoff records, exports, costs, labor/equipment, production-rate, or vendor-pricing outputs
+
 ## Current guardrails
 
 - Chat history is not the system of record.
@@ -309,6 +327,8 @@ The PDF Intake Packetization Skill governance can:
 - Sanitary sewer audit adapter outputs remain provisional audit inputs only and must not bypass human review.
 - PDF intake packetization skill governance is documentation/schema/test tooling only.
 - PDF intake packetization skill outputs must remain provisional, review-gated, and non-quantity-producing.
+- Codex task builder skill governance is documentation/schema/test tooling only.
+- Codex task builder skill outputs must remain provisional, review-gated, and must not grant verification, Airtable checkpoint, or direct repo merge authority.
 - Audit outputs must remain provisional and human-review gated until explicitly resolved by future governance.
 - Audit promotion gate outputs are not quantity-export-ready.
 - Promoted audit candidates must still pass takeoff review before quantity summary or export.
@@ -333,11 +353,13 @@ The VS1A sanitary utility extraction audit harness, audit review promotion gate,
 @v4/vs1a
 ```
 
-The V4 PDF Intake Packetization Skill governance is verified as documentation/schema/test tooling:
+The V4 skill governance artifacts are verified as documentation/schema/test tooling:
 
 ```text
 docs/skills/pdf-intake-packetization.md
+docs/skills/codex-task-builder.md
 schemas/skills/pdf-intake-packetization.output.schema.json
+schemas/skills/codex-task-builder.output.schema.json
 ```
 
 The VS1B vendor quote intake and vendor quote registry review gate modules are verified and exposed through the VS1B root package barrel export:
@@ -423,10 +445,10 @@ Goal: add a controlled synthetic fixture/test that proves the sanitary sewer mod
 Optional next skill lane after the sewer fixture:
 
 ```text
-V4 Codex Task Builder Skill
+PR Review / Merge Gate Skill
 ```
 
-Goal: add governed documentation/schema/test support for producing consistent Codex task prompts with current verified state, routing type, guardrails, required tests, CI commands, and return format.
+Goal: add governed documentation/schema/test support for reviewing PR scope, changed files, CI evidence, guardrail compliance, drift risk, and checkpoint readiness before merge.
 
 ## New session boot instruction
 
@@ -437,7 +459,7 @@ This is a V4 Civil Estimating Platform session.
 Use GitHub `djscroggs1970/V4-Repository`, Airtable `V4 Base`, Drive `V4 Framework`, and ClickUp `V4 Framework` as the external sources of truth.
 Read `AGENTS.md`, `docs/continuity/source-of-truth.md`, `docs/continuity/current-state.md`, and `docs/governance/production-rate-source-policy.md` before continuing.
 Codex is available as a controlled implementation assistant, but this chat remains task controller/reviewer and Codex must follow AGENTS.md.
-Current verified version: `v0.1-pdf-intake-packetization-skill-governance-ci-pass`.
+Current verified version: `v0.1-codex-task-builder-skill-governance-ci-pass`.
 Current goal: [one sentence].
 Do not rely on prior job data unless explicitly provided.
 Maintain job-instance isolation and no-bleed/no-drift rules.
