@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://v4/schemas/skills/codex-task-builder.output.schema.json",
+  "title": "V4 Codex Task Builder Skill Output (Governed Provisional)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "task_class",
+    "routing",
+    "routing_reason",
+    "goal_summary",
+    "provisional_status",
+    "review_gated",
+    "hard_guardrails",
+    "ci_command_sequence",
+    "codex_return_format",
+    "governance_instructions",
+    "manual_confirmation_required",
+    "manual_confirmation_reasons",
+    "trace_refs"
+  ],
+  "properties": {
+    "task_class": {
+      "type": "string",
+      "enum": [
+        "new_repo_slice",
+        "fix_existing_pr",
+        "recreate_local_only_codex_result",
+        "docs_only_continuity_update",
+        "schema_test_governance_fixture_slice",
+        "verification_only_request",
+        "review_checkpoint_preparation",
+        "skill_governance_documentation_slice"
+      ]
+    },
+    "routing": {
+      "type": "string",
+      "enum": ["NEW TASK", "SAME TASK", "FIX CURRENT PR", "VERIFY / REPORT ONLY"]
+    },
+    "routing_reason": { "type": "string", "minLength": 1 },
+    "goal_summary": { "type": "string", "minLength": 1 },
+    "current_verified_version": { "type": "string", "minLength": 1 },
+    "latest_verified_checkpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pr_ref", "ci_run_ref", "merge_sha", "airtable_checkpoint_ref"],
+      "properties": {
+        "pr_ref": { "type": "string", "minLength": 1 },
+        "ci_run_ref": { "type": "string", "minLength": 1 },
+        "merge_sha": { "type": "string", "minLength": 1 },
+        "airtable_checkpoint_ref": { "type": "string", "minLength": 1 }
+      }
+    },
+    "provisional_status": { "type": "string", "const": "provisional_pending_manual_review" },
+    "review_gated": { "type": "boolean", "const": true },
+    "hard_guardrails": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "documentation_schema_test_only",
+        "no_production_automation",
+        "no_codex_runtime_calling_code",
+        "no_airtable_writes",
+        "no_direct_repo_merge_action",
+        "no_current_state_update_without_authorization",
+        "do_not_mark_verified",
+        "do_not_authorize_full_pdf_intelligence",
+        "no_real_project_data",
+        "no_quantities_takeoff_or_cost_outputs",
+        "preserve_job_instance_isolation"
+      ],
+      "properties": {
+        "documentation_schema_test_only": { "type": "boolean", "const": true },
+        "no_production_automation": { "type": "boolean", "const": true },
+        "no_codex_runtime_calling_code": { "type": "boolean", "const": true },
+        "no_airtable_writes": { "type": "boolean", "const": true },
+        "no_direct_repo_merge_action": { "type": "boolean", "const": true },
+        "no_current_state_update_without_authorization": { "type": "boolean", "const": true },
+        "do_not_mark_verified": { "type": "boolean", "const": true },
+        "do_not_authorize_full_pdf_intelligence": { "type": "boolean", "const": true },
+        "no_real_project_data": { "type": "boolean", "const": true },
+        "no_quantities_takeoff_or_cost_outputs": { "type": "boolean", "const": true },
+        "preserve_job_instance_isolation": { "type": "boolean", "const": true }
+      }
+    },
+    "ci_command_sequence": {
+      "type": "array",
+      "minItems": 7,
+      "maxItems": 7,
+      "prefixItems": [
+        { "type": "string", "const": "pnpm install --frozen-lockfile=false" },
+        { "type": "string", "const": "pnpm build" },
+        { "type": "string", "const": "pnpm typecheck" },
+        { "type": "string", "const": "pnpm test" },
+        { "type": "string", "const": "pnpm validate:rules" },
+        { "type": "string", "const": "pnpm sample:vs1a" },
+        { "type": "string", "const": "pnpm sample:vs1a:upload" }
+      ],
+      "items": false
+    },
+    "codex_return_format": {
+      "type": "array",
+      "minItems": 6,
+      "items": {
+        "type": "string",
+        "enum": ["changed_files", "summary", "test_ci_results", "pr_opened", "pr_url_or_number_if_visible", "deviations_from_scope"]
+      },
+      "allOf": [
+        { "contains": { "const": "changed_files" } },
+        { "contains": { "const": "summary" } },
+        { "contains": { "const": "test_ci_results" } },
+        { "contains": { "const": "pr_opened" } },
+        { "contains": { "const": "pr_url_or_number_if_visible" } },
+        { "contains": { "const": "deviations_from_scope" } }
+      ]
+    },
+    "governance_instructions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["do_not_update_current_state_unless_authorized", "do_not_mark_anything_verified", "do_not_create_airtable_checkpoint_records"],
+      "properties": {
+        "do_not_update_current_state_unless_authorized": { "type": "boolean", "const": true },
+        "do_not_mark_anything_verified": { "type": "boolean", "const": true },
+        "do_not_create_airtable_checkpoint_records": { "type": "boolean", "const": true }
+      }
+    },
+    "manual_confirmation_required": { "type": "boolean" },
+    "manual_confirmation_reasons": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "vague_goals",
+          "real_job_data",
+          "pdf_intelligence",
+          "quantities_or_costs",
+          "airtable_governance_changes",
+          "current_state_md_changes",
+          "multiple_module_work",
+          "external_credentials_or_apps",
+          "combined_oversized_slices",
+          "checkpoint_or_mark_verified_request",
+          "missing_current_verified_version",
+          "missing_latest_verified_checkpoint",
+          "missing_routing"
+        ]
+      }
+    },
+    "trace_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    }
+  }
+}
