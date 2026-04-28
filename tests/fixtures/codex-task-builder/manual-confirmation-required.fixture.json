@@ -1,0 +1,57 @@
+{
+  "task_class": "new_repo_slice",
+  "routing": "NEW TASK",
+  "routing_reason": "Input requests broad work touching unauthorized data and verification claims.",
+  "goal_summary": "Attempted oversized request requiring governance stop and manual confirmation.",
+  "provisional_status": "provisional_pending_manual_review",
+  "review_gated": true,
+  "hard_guardrails": {
+    "documentation_schema_test_only": true,
+    "no_production_automation": true,
+    "no_codex_runtime_calling_code": true,
+    "no_airtable_writes": true,
+    "no_direct_repo_merge_action": true,
+    "no_current_state_update_without_authorization": true,
+    "do_not_mark_verified": true,
+    "do_not_authorize_full_pdf_intelligence": true,
+    "no_real_project_data": true,
+    "no_quantities_takeoff_or_cost_outputs": true,
+    "preserve_job_instance_isolation": true
+  },
+  "ci_command_sequence": [
+    "pnpm install --frozen-lockfile=false",
+    "pnpm build",
+    "pnpm typecheck",
+    "pnpm test",
+    "pnpm validate:rules",
+    "pnpm sample:vs1a",
+    "pnpm sample:vs1a:upload"
+  ],
+  "codex_return_format": [
+    "changed_files",
+    "summary",
+    "test_ci_results",
+    "pr_opened",
+    "pr_url_or_number_if_visible",
+    "deviations_from_scope"
+  ],
+  "governance_instructions": {
+    "do_not_update_current_state_unless_authorized": true,
+    "do_not_mark_anything_verified": true,
+    "do_not_create_airtable_checkpoint_records": true
+  },
+  "manual_confirmation_required": true,
+  "manual_confirmation_reasons": [
+    "missing_current_verified_version",
+    "missing_latest_verified_checkpoint",
+    "combined_oversized_slices",
+    "checkpoint_or_mark_verified_request",
+    "real_job_data",
+    "pdf_intelligence",
+    "quantities_or_costs"
+  ],
+  "trace_refs": [
+    "manual_confirmation:required",
+    "governance:blocking_conditions"
+  ]
+}

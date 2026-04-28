@@ -1,0 +1,38 @@
+{
+  "task_class": "schema_test_governance_fixture_slice",
+  "routing": "SAME TASK",
+  "routing_reason": "Continuation of the same governed slice to add deterministic fixture and test coverage.",
+  "goal_summary": "Continue current slice with fixture and governance-test completion.",
+  "current_verified_version": "v0.1-pdf-intake-packetization-skill-governance-ci-pass",
+  "latest_verified_checkpoint": {
+    "pr_ref": "PR #23",
+    "ci_run_ref": "25024494691",
+    "merge_sha": "2fcc6e0a50a99018887f7a0b7852c041f940239d",
+    "airtable_checkpoint_ref": "recLNY1JlVNa09RjH"
+  },
+  "provisional_status": "provisional_pending_manual_review",
+  "review_gated": true,
+  "hard_guardrails": {
+    "documentation_schema_test_only": true,
+    "no_production_automation": true,
+    "no_codex_runtime_calling_code": true,
+    "no_airtable_writes": true,
+    "no_direct_repo_merge_action": true,
+    "no_current_state_update_without_authorization": true,
+    "do_not_mark_verified": true,
+    "do_not_authorize_full_pdf_intelligence": true,
+    "no_real_project_data": true,
+    "no_quantities_takeoff_or_cost_outputs": true,
+    "preserve_job_instance_isolation": true
+  },
+  "ci_command_sequence": ["pnpm install --frozen-lockfile=false", "pnpm build", "pnpm typecheck", "pnpm test", "pnpm validate:rules", "pnpm sample:vs1a", "pnpm sample:vs1a:upload"],
+  "codex_return_format": ["changed_files", "summary", "test_ci_results", "pr_opened", "pr_url_or_number_if_visible", "deviations_from_scope"],
+  "governance_instructions": {
+    "do_not_update_current_state_unless_authorized": true,
+    "do_not_mark_anything_verified": true,
+    "do_not_create_airtable_checkpoint_records": true
+  },
+  "manual_confirmation_required": false,
+  "manual_confirmation_reasons": [],
+  "trace_refs": ["routing:same_task", "scope:fixtures_and_tests"]
+}
