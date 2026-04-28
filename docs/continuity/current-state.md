@@ -1,12 +1,14 @@
 # V4 Current State
 
 Status: active restart snapshot  
-Last updated: 2026-04-27  
-Current verified version: `v0.1-codex-task-builder-skill-governance-ci-pass`
+Last updated: 2026-04-28  
+Current verified version: `v0.1-pr-review-merge-gate-skill-governance-ci-pass`
 
 ## Purpose
 
-This document is the compact restart point for future V4 Civil Estimating Platform sessions. Use it with `docs/continuity/source-of-truth.md`, root `AGENTS.md`, and the latest Airtable checkpoint.
+This document is the compact restart point for V4 Civil Estimating Platform sessions. Use it with `docs/continuity/source-of-truth.md`, root `AGENTS.md`, `docs/governance/production-rate-source-policy.md`, and the latest Airtable framework checkpoint.
+
+Detailed per-slice history lives in Airtable `V4 Base`. This file records the current verified restart state and the guardrails that must survive chat restarts.
 
 ## Source of truth locations
 
@@ -20,21 +22,27 @@ This document is the compact restart point for future V4 Civil Estimating Platfo
 
 ## Latest verified checkpoint
 
-`v0.1-codex-task-builder-skill-governance-ci-pass`
+`v0.1-pr-review-merge-gate-skill-governance-ci-pass`
 
 Evidence:
 
 ```text
-PR: #25 Add Codex task builder skill governance
-GitHub Actions CI run: 25030135344
+PR: #27 Add PR review merge gate skill governance
+GitHub Actions CI run: 25081439699
 CI conclusion: success
-Merge SHA: f1667650ea99b2704ed9da2100b50c117fa6ec1b
-Airtable checkpoint record: recqCnrkTp8fRfT3I
+Merge SHA: 9228613af89b1b1177eb9c07b29eb1bf3cedfa6a
+Airtable checkpoint record: reco50DGPR0HLofn9
 ```
+
+## Latest continuity update
+
+This document update records the PR #27 checkpoint and must itself pass CI before it becomes the durable restart snapshot.
 
 ## Current verified VS1A chain
 
 VS1A is verified through the sanitary sewer candidate audit adapter stage.
+
+Verified VS1A chain:
 
 1. Upload registration
 2. Sheet index creation
@@ -52,9 +60,13 @@ VS1A is verified through the sanitary sewer candidate audit adapter stage.
 14. Sanitary sewer module extraction candidate builder
 15. Sanitary sewer candidate audit adapter
 
+VS1A can create controlled project/upload/sheet/takeoff/review/quantity-export structures and controlled sanitary sewer extraction/audit candidate structures, but the extraction/audit/candidate layers remain provisional and review-gated. Sanitary sewer audit adapter outputs remain audit inputs only and must not create quantity exports, summary output, costs, or bid-grade claims.
+
 ## Current verified VS1B chain
 
 VS1B is verified through vendor quote registry merge review gate.
+
+Verified VS1B chain:
 
 1. Initial cost buildout from approved quantity exports
 2. Cost input registry
@@ -75,20 +87,23 @@ VS1B is verified through vendor quote registry merge review gate.
 17. Vendor quote intake / normalized pricing schema
 18. Vendor quote registry merge review gate
 
+VS1B can consume approved quantity exports and validated cost input registries, assemble/persist/review estimate packages and client-facing package structures, and normalize/review vendor quote lines. It must not transmit files externally, create labor/equipment/production-rate records from vendor quote intake/review, or use placeholder production rates in cost output.
+
 ## Current verified governance/tooling chain
 
 V4 includes a controlled Codex command lane and governed skill support.
 
 1. Codex can be used as a repo-bound implementation assistant.
 2. This chat remains the task controller and governance reviewer.
-3. The user acts as messenger between this chat and Codex when direct handoff is unavailable.
+3. The user may relay tasks/results between this chat and Codex when direct handoff is unavailable.
 4. Codex must follow root `AGENTS.md`.
 5. Codex may create repo-scoped branches/PRs, but it cannot mark slices verified.
 6. Codex cannot create Airtable checkpoints.
-7. CI/check evidence and human/governance review are still required before verification.
+7. CI/check evidence and human/governance review are required before verification.
 8. If Codex cannot push/open a visible PR because of environment restrictions, the change may be recreated through the GitHub connector only after confirming changed-file scope and preserving V4 guardrails.
-9. PDF intake packetization skill governance is verified as documentation/schema/test tooling only.
-10. Codex task builder skill governance is verified as documentation/schema/test tooling only.
+9. PDF Intake Packetization Skill governance is verified as documentation/schema/test tooling only.
+10. Codex Task Builder Skill governance is verified as documentation/schema/test tooling only.
+11. PR Review / Merge Gate Skill governance is verified as documentation/schema/test tooling only.
 
 ## Current implementation packages
 
@@ -116,15 +131,7 @@ packages/vs1a/src/sanitary-sewer-extraction-candidates.ts
 packages/vs1a/src/sanitary-sewer-audit-adapter.ts
 packages/vs1a/src/pdf-intake-packetization-governance.test.ts
 packages/vs1a/src/codex-task-builder-governance.test.ts
-packages/vs1a/src/index.test.ts
-packages/vs1a/src/plan-harvest.test.ts
-packages/vs1a/src/promenade-plan-validation.test.ts
-packages/vs1a/src/sewer-extraction-audit.test.ts
-packages/vs1a/src/audit-review-gate.test.ts
-packages/vs1a/src/audit-candidate-handoff.test.ts
-packages/vs1a/src/civil-extraction-candidates.test.ts
-packages/vs1a/src/sanitary-sewer-extraction-candidates.test.ts
-packages/vs1a/src/sanitary-sewer-audit-adapter.test.ts
+packages/vs1a/src/pr-review-merge-gate-governance.test.ts
 ```
 
 Key VS1B files:
@@ -148,18 +155,6 @@ packages/vs1b/src/delivery-transmission-gate.ts
 packages/vs1b/src/controlled-adapter-boundary.ts
 packages/vs1b/src/vendor-quote-intake.ts
 packages/vs1b/src/vendor-quote-registry-review-gate.ts
-packages/vs1b/src/index.test.ts
-packages/vs1b/src/estimate-package-persistence.test.ts
-packages/vs1b/src/bid-grade-release-gate.test.ts
-packages/vs1b/src/output-document-generation.test.ts
-packages/vs1b/src/output-document-persistence-review.test.ts
-packages/vs1b/src/client-export-package.test.ts
-packages/vs1b/src/client-package-release-gate.test.ts
-packages/vs1b/src/delivery-manifest.test.ts
-packages/vs1b/src/delivery-transmission-gate.test.ts
-packages/vs1b/src/controlled-adapter-boundary.test.ts
-packages/vs1b/src/vendor-quote-intake.test.ts
-packages/vs1b/src/vendor-quote-registry-review-gate.test.ts
 ```
 
 Key governance/tooling files:
@@ -171,145 +166,31 @@ docs/continuity/current-state.md
 docs/governance/production-rate-source-policy.md
 docs/skills/pdf-intake-packetization.md
 docs/skills/codex-task-builder.md
+docs/skills/pr-review-merge-gate.md
 schemas/skills/pdf-intake-packetization.output.schema.json
 schemas/skills/codex-task-builder.output.schema.json
-tests/fixtures/pdf-intake-packetization/clear-sheet-index.fixture.json
-tests/fixtures/pdf-intake-packetization/missing-index.fixture.json
-tests/fixtures/pdf-intake-packetization/duplicate-sheet-id.fixture.json
-tests/fixtures/pdf-intake-packetization/mixed-utility.fixture.json
-tests/fixtures/pdf-intake-packetization/broad-construction-details.fixture.json
-tests/fixtures/codex-task-builder/new-task.fixture.json
-tests/fixtures/codex-task-builder/same-task.fixture.json
-tests/fixtures/codex-task-builder/fix-current-pr.fixture.json
-tests/fixtures/codex-task-builder/verify-report-only.fixture.json
-tests/fixtures/codex-task-builder/manual-confirmation-required.fixture.json
+schemas/skills/pr-review-merge-gate.output.schema.json
+tests/fixtures/pdf-intake-packetization/
+tests/fixtures/codex-task-builder/
+tests/fixtures/pr-review-merge-gate/
 .github/workflows/ci.yml
 ```
 
-## Verified VS1A behavior
-
-The current VS1A pipeline can:
-
-- create a project instance
-- register an uploaded PDF drawing using metadata
-- create controlled drawing sheet records
-- create structured/manual sanitary takeoff candidates
-- create provisional sandbox harvest candidates with provenance and confidence
-- validate source sheet references
-- split pipe quantities by depth class when depths are provided
-- apply review decisions to takeoff candidates
-- require notes for rejected or flagged review items
-- summarize approved takeoff items only
-- exclude rejected, pending, and needs-review items from quantity summary
-- group quantity summary by material, diameter, depth class, and unit
-- preserve source takeoff item IDs
-- create a quantity-only export object
-- block export when review items are still open
-- create a project-isolated quantity export persistence manifest
-- create a sanitary utility extraction audit harness for classifying candidate findings
-- classify audit records as found utility runs, uncertain candidates, excluded non-target items, or unresolved plan questions
-- keep extraction audit results provisional with `audit_status: provisional_incomplete` and `completeness_claim: not_claimed`
-- require human review for every extraction audit record
-- allow only approved found-run audit records with required handoff fields to become eligible for takeoff review
-- keep promoted audit candidates pending takeoff review and not quantity-export-ready
-- convert completed audit promotion gate output into controlled pending `TakeoffItem` records
-- require completed audit review promotion gate status before handoff
-- block open audit review gates with `audit_handoff_requires_completed_gate`
-- validate eligible promoted candidate state and required handoff fields
-- preserve audit, audit-record, candidate, project, document, and sheet trace references on the handoff manifest/result
-- avoid mutating `TakeoffItem` with trace references
-- keep generated takeoff items pending review
-- keep handoff output `quantity_export_ready: false`
-- avoid summarizing quantities or creating quantity exports from handoff output
-- create shared civil extraction candidate records for supported civil scopes
-- support `sanitary_sewer`, `storm_drainage`, `water`, `paving_concrete`, `erosion_control`, and `earthwork_agtek_handoff` extraction scopes
-- keep shared civil extraction candidates module-scoped and project-scoped
-- preserve project, document, sheet, and candidate trace references for shared civil extraction candidates
-- enforce selected-sheet boundaries for shared civil extraction candidates
-- reject duplicate candidate IDs, unsupported scopes, missing identity fields, and invalid confidence values
-- keep shared civil extraction candidates `review_status: pending`, `completeness_claim: not_claimed`, and `quantity_export_ready: false`
-- avoid creating `TakeoffItem` records from the shared civil extraction candidate framework
-- create module-specific sanitary sewer extraction candidates from structured pipe, structure, and profile observation inputs
-- convert sanitary sewer module candidates into shared civil extraction candidates with `extraction_scope: sanitary_sewer`
-- keep sanitary pipe, structure, and profile candidates separated while preserving shared civil extraction output
-- preserve sanitary plan/profile trace references and available pipe/profile attributes
-- reject duplicate sanitary candidate IDs, unselected sheet references, invalid confidence values, endpoint/trace-empty pipe candidates, and nonpositive pipe length or diameter when provided
-- keep sanitary sewer extraction candidates pending review, `completeness_claim: not_claimed`, and `quantity_export_ready: false`
-- avoid creating `TakeoffItem` records, quantity summaries, or quantity exports from the sanitary sewer extraction candidate builder
-- convert sanitary sewer pipe candidates into sewer extraction audit candidate inputs
-- build sanitary sewer audit drawing sheet indexes from selected sheet IDs
-- keep sanitary structure/profile candidates as skipped context rather than found pipe runs
-- preserve project, document, sheet, candidate, sanitary pipe field, confidence, and trace references through the sanitary sewer audit adapter
-- reject non-sanitary scope, duplicate audit candidate IDs, missing trace references, project/document mismatch, quantity-export-ready candidates, and invalid completeness claims in the sanitary sewer audit adapter
-- set sanitary sewer audit adapter `audit_ready` and `next_required_action` based on pipe candidate availability
-- keep sanitary sewer audit adapter output provisional with `completeness_claim: not_claimed`
-- avoid creating `TakeoffItem` records, quantity summaries, quantity exports, promotion records, or handoff records from the sanitary sewer audit adapter
-
-## Verified VS1B behavior
-
-The current VS1B pipeline can:
-
-- consume approved quantity-only exports
-- apply controlled material quotes
-- apply controlled labor rates
-- apply controlled equipment rates
-- apply validated production rates
-- reject placeholder production rates
-- create traceable cost buildout lines and totals
-- validate cost input registries
-- enforce unique registry IDs
-- enforce production-rate links to known crew and equipment records
-- preserve quantity export, takeoff item, quote, labor, equipment, production-rate, and registry traceability
-- create a project-isolated cost scenario output manifest
-- persist cost scenario output records with storage path and trace references
-- assemble and persist controlled human-review estimate packages
-- create estimate package human review records and block rejected or needs-review packages from release
-- build bid-grade release manifests only from approved human-review records and trace-complete package/persistence records
-- generate controlled output document sets only from approved release manifests
-- persist and review generated output document sets
-- assemble client-facing export package manifests only from persisted and approved output document review records
-- persist client-facing export packages and require a release gate before delivery manifest generation
-- create and persist delivery manifests without transmitting, uploading, emailing, or externally distributing files
-- create external transmission gate records that authorize only future adapter-boundary preparation
-- define disabled controlled adapter-boundary records for future external transfer paths
-- normalize user-provided vendor quote lines into traceable material quote records
-- preserve vendor quote batch, project instance, source document, source file, vendor, quote-line, and normalized quote trace references
-- keep normalized vendor quote records pending registry review and not automatically merged into the validated cost input registry
-- reject duplicate quote line IDs, missing quote identity fields, invalid material/diameter/uom/unit-cost fields, unsupported currency, and non-upload source origins
-- review normalized vendor quote records before registry merge
-- support approved, rejected, and needs-review vendor quote registry decisions
-- require reviewer identity for every vendor quote registry review row
-- require notes for rejected or needs-review vendor quote registry decisions
-- reject duplicate or unknown vendor quote registry review rows
-- keep unreviewed and needs-review vendor quotes open and not merge-ready
-- block rejected vendor quotes from registry merge
-- allow only approved normalized quote records to become eligible for registry merge
-- preserve project instance, source document, source file, vendor, quote batch, quote line, quote ID, and trace references through vendor quote registry review
-- avoid creating labor rates, equipment rates, production rates, or validated cost input registry records from the vendor quote registry review gate
-
 ## Verified skill/governance behavior
 
-The PDF Intake Packetization Skill governance can:
+### PDF Intake Packetization Skill governance
 
-- define a provisional-only output contract for plan PDF intake packetization
-- require `provisional_status: provisional_pending_manual_review`
-- require `review_gated: true`
-- require hard guardrail confirmations that no quantities, takeoff items, costs, pricing records, or production-rate records were created
-- require fully typed `sheet_classifications`, `possible_relationships`, `source_artifact_register`, and `manual_confirmation_flags`
-- require confidence values bounded from 0 to 1
-- require trace references on applicable records
-- provide synthetic fixtures for clear index, missing index, duplicate sheet IDs, mixed utility sheets, and broad construction details
-- keep C-50/C-51 examples synthetic sheet naming examples only
-- validate governance fixtures without production OCR, real plan parsing, real project data, quantity extraction, takeoff creation, or pricing output
+The PDF Intake Packetization Skill governance can define a provisional-only output contract for plan PDF intake packetization; require `provisional_status: provisional_pending_manual_review`; require `review_gated: true`; require hard guardrail confirmations that no quantities, takeoff items, costs, pricing records, or production-rate records were created; require typed sheet classifications, possible relationships, source artifact register, manual confirmation flags, bounded confidence values, and trace references; and validate synthetic fixtures without production OCR, real plan parsing, real project data, quantity extraction, takeoff creation, or pricing output.
 
-The Codex Task Builder Skill governance can:
+### Codex Task Builder Skill governance
 
-- define governed output for Codex task prompt creation
-- support routing for `NEW TASK`, `SAME TASK`, `FIX CURRENT PR`, and `VERIFY / REPORT ONLY`
-- support task classes for new repo slices, PR fixes, local-only Codex result recreation, docs-only continuity updates, schema/test/governance fixture slices, verification-only requests, review/checkpoint preparation, and skill governance documentation slices
-- require routing reason, provisional status, review gating, hard guardrails, CI command sequence, Codex return format, governance instructions, and non-empty trace references
-- require manual confirmation for vague goals, real job data, PDF intelligence, quantities or costs, Airtable governance changes, current-state changes, multiple-module work, external credentials/apps, combined oversized slices, and checkpoint/mark-verified requests
-- remain documentation/schema/test tooling only, without production automation, Codex runtime-calling code, Airtable writes, direct repo merge action authority, verified-state claims, full PDF intelligence, real project data, quantities, takeoff records, exports, costs, labor/equipment, production-rate, or vendor-pricing outputs
+The Codex Task Builder Skill governance can define governed output for Codex task prompt creation; support `NEW TASK`, `SAME TASK`, `FIX CURRENT PR`, and `VERIFY / REPORT ONLY`; classify task types; require routing reason, provisional status, review gating, hard guardrails, CI command sequence, return format, governance instructions, and trace references; and require manual confirmation for vague goals, real job data, PDF intelligence, quantities/costs, Airtable governance changes, current-state changes, multi-module work, external apps/credentials, oversized slices, and checkpoint/mark-verified requests.
+
+### PR Review / Merge Gate Skill governance
+
+The PR Review / Merge Gate Skill governance can review GitHub pull request metadata, changed-file scope, CI evidence, source-of-truth guardrails, drift risk, manual confirmation triggers, merge readiness, checkpoint readiness, and continuity update readiness. It defines conservative decision and recommendation enums for `ready_to_merge`, `blocked_failed_ci`, `blocked_scope_drift`, `blocked_guardrail_violation`, `needs_manual_review`, `docs_only_ready`, `checkpoint_ready_after_merge`, and `not_checkpoint_eligible` outcomes.
+
+It treats GitHub Actions CI as authoritative, preserves the required CI command sequence, blocks missing/failed CI from merge recommendation, blocks guardrail violations before scope/CI optimism, prevents premature verified/checkpoint/current-state claims, and remains documentation/schema/test tooling only. It creates no merge automation, Airtable write automation, verified-state authority, current-state update authority, PDF intelligence, real job data, quantities, takeoff records, exports, costs, labor/equipment records, production-rate records, vendor-pricing records, estimating logic changes, or external transmission behavior.
 
 ## Current guardrails
 
@@ -321,20 +202,19 @@ The Codex Task Builder Skill governance can:
 - Only approved reviewed takeoff items can feed quantity summary or export.
 - Extraction audit harnesses are not complete extraction claims.
 - Civil extraction candidate framework outputs are provisional candidate records only.
-- Civil extraction candidate framework outputs must remain module-scoped, human-review gated, and not quantity-export-ready.
+- Civil extraction candidate outputs must remain module-scoped, human-review gated, and not quantity-export-ready.
 - Sanitary sewer extraction candidate builder outputs are provisional module records only.
-- Sanitary sewer extraction candidate builder outputs must remain human-review gated and must not be treated as full sewer takeoff.
 - Sanitary sewer audit adapter outputs remain provisional audit inputs only and must not bypass human review.
 - PDF intake packetization skill governance is documentation/schema/test tooling only.
-- PDF intake packetization skill outputs must remain provisional, review-gated, and non-quantity-producing.
 - Codex task builder skill governance is documentation/schema/test tooling only.
-- Codex task builder skill outputs must remain provisional, review-gated, and must not grant verification, Airtable checkpoint, or direct repo merge authority.
+- PR review / merge gate skill governance is documentation/schema/test tooling only.
+- Skill outputs must remain provisional, review-gated, and must not grant verification, Airtable checkpoint, direct merge, or current-state authority.
 - Audit outputs must remain provisional and human-review gated until explicitly resolved by future governance.
 - Audit promotion gate outputs are not quantity-export-ready.
 - Promoted audit candidates must still pass takeoff review before quantity summary or export.
-- Audit handoff outputs still require takeoff review before quantity summary/export.
 - Cost scenarios may consume only approved quantity exports and validated cost input registries.
 - Placeholder production rates may exist in tests but must be blocked from estimate output.
+- Production rates must be registered, versioned, traceable, reviewed, tied to crew/equipment, and validated before cost output.
 - Vendor quote intake may normalize only user-provided quote data and must not invent unit costs or vendor assumptions.
 - Normalized vendor quote records must remain pending registry review before they can feed validated cost input registries.
 - Vendor quote registry review may make approved quote records eligible for registry merge only; it must not create a validated cost input registry by itself.
@@ -358,8 +238,10 @@ The V4 skill governance artifacts are verified as documentation/schema/test tool
 ```text
 docs/skills/pdf-intake-packetization.md
 docs/skills/codex-task-builder.md
+docs/skills/pr-review-merge-gate.md
 schemas/skills/pdf-intake-packetization.output.schema.json
 schemas/skills/codex-task-builder.output.schema.json
+schemas/skills/pr-review-merge-gate.output.schema.json
 ```
 
 The VS1B vendor quote intake and vendor quote registry review gate modules are verified and exposed through the VS1B root package barrel export:
@@ -368,24 +250,7 @@ The VS1B vendor quote intake and vendor quote registry review gate modules are v
 @v4/vs1b
 ```
 
-The VS1B vendor quote intake module is also exposed through package subpath export:
-
-```text
-@v4/vs1b/vendor-quote-intake
-```
-
-The output document persistence/review, client-facing export package, client package release gate, delivery manifest, delivery transmission gate, and controlled adapter boundary modules are verified and exposed through package subpath exports:
-
-```text
-@v4/vs1b/output-document-persistence-review
-@v4/vs1b/client-export-package
-@v4/vs1b/client-package-release-gate
-@v4/vs1b/delivery-manifest
-@v4/vs1b/delivery-transmission-gate
-@v4/vs1b/controlled-adapter-boundary
-```
-
-Direct root `packages/vs1b/src/index.ts` barrel exports for the older document/delivery modules remain follow-up cleanup items. Package subpath exports in `packages/vs1b/package.json` are verified.
+Some older VS1B document/delivery modules are also exposed through package subpath exports. Direct root barrel cleanup for older document/delivery modules remains a follow-up cleanup item unless later verified state says otherwise.
 
 ## Current CI command set
 
@@ -401,9 +266,7 @@ pnpm sample:vs1a
 pnpm sample:vs1a:upload
 ```
 
-CI workflow is currently set to Node 24 and clean action runtime.
-
-Some standalone sample scripts may exist outside CI and should be treated as supplemental checks unless explicitly wired into the workflow.
+CI workflow is currently set to Node 24 and clean action runtime. Standalone sample scripts outside CI are supplemental unless explicitly wired into the workflow.
 
 ## Codex command lane
 
@@ -434,7 +297,7 @@ Known Codex environment limitation:
 
 ## Next logical slice
 
-Recommended next slice:
+Recommended next implementation slice:
 
 ```text
 Sanitary Sewer End-to-End Candidate Chain Fixture
@@ -442,13 +305,13 @@ Sanitary Sewer End-to-End Candidate Chain Fixture
 
 Goal: add a controlled synthetic fixture/test that proves the sanitary sewer module candidate builder, audit adapter, sewer extraction audit harness, audit review promotion gate, and audit candidate takeoff handoff can work together end-to-end without real job data, PDF intelligence, autonomous quantity export, or bypassing human review.
 
-Optional next skill lane after the sewer fixture:
+Next optional skill lane after implementation work resumes:
 
 ```text
-PR Review / Merge Gate Skill
+Continuity / Restart Snapshot Skill
 ```
 
-Goal: add governed documentation/schema/test support for reviewing PR scope, changed files, CI evidence, guardrail compliance, drift risk, and checkpoint readiness before merge.
+Goal: add governed documentation/schema/test support for compact restart snapshots, external source-of-truth checks, and safe chat migration without replacing Airtable checkpoint governance.
 
 ## New session boot instruction
 
@@ -459,7 +322,7 @@ This is a V4 Civil Estimating Platform session.
 Use GitHub `djscroggs1970/V4-Repository`, Airtable `V4 Base`, Drive `V4 Framework`, and ClickUp `V4 Framework` as the external sources of truth.
 Read `AGENTS.md`, `docs/continuity/source-of-truth.md`, `docs/continuity/current-state.md`, and `docs/governance/production-rate-source-policy.md` before continuing.
 Codex is available as a controlled implementation assistant, but this chat remains task controller/reviewer and Codex must follow AGENTS.md.
-Current verified version: `v0.1-codex-task-builder-skill-governance-ci-pass`.
+Current verified version: `v0.1-pr-review-merge-gate-skill-governance-ci-pass`.
 Current goal: [one sentence].
 Do not rely on prior job data unless explicitly provided.
 Maintain job-instance isolation and no-bleed/no-drift rules.
