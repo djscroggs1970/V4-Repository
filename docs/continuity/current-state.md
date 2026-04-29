@@ -2,7 +2,7 @@
 
 Status: active restart snapshot  
 Last updated: 2026-04-28  
-Current verified version: `v0.1-continuity-restart-snapshot-skill-governance-ci-pass`
+Current verified version: `v0.1-source-artifact-register-qa-skill-governance-ci-pass`
 
 ## Purpose
 
@@ -22,21 +22,21 @@ Chat is the command lane only. GitHub, Airtable, Drive, and ClickUp hold durable
 
 ## Latest verified checkpoint
 
-`v0.1-continuity-restart-snapshot-skill-governance-ci-pass`
+`v0.1-source-artifact-register-qa-skill-governance-ci-pass`
 
 Evidence:
 
 ```text
-PR: #29 Add continuity restart snapshot skill governance
-GitHub Actions CI run: 25083557482
+PR: #31 Add source artifact register QA skill governance
+GitHub Actions CI run: 25087404299
 CI conclusion: success
-Merge SHA: 9c65908162206e11b6baed8228d9e0779491dc05
-Airtable checkpoint record: recEtzLvQyrkzBdVc
+Merge SHA: b3741c2185add61b049a26ef4db7221f82794ab3
+Airtable checkpoint record: recADXh7FaGyPQar7
 ```
 
-## Continuity PR note
+## Latest continuity update
 
-PR #28 was closed unmerged because it only captured the PR #27 checkpoint and was superseded by the PR #29 checkpoint. This file update records the PR #29 checkpoint instead.
+This document update records the PR #31 checkpoint. Previous continuity PR #30 recorded the PR #29 checkpoint and merged with SHA `3baa0e464e5143e555e1040789e7468ffa3b2f73`.
 
 ## Current verified VS1A chain
 
@@ -105,6 +105,7 @@ V4 includes a controlled Codex command lane and governed skill support.
 10. Codex Task Builder Skill governance is verified as documentation/schema/test tooling only.
 11. PR Review / Merge Gate Skill governance is verified as documentation/schema/test tooling only.
 12. Continuity / Restart Snapshot Skill governance is verified as documentation/schema/test tooling only.
+13. Source Artifact Register QA Skill governance is verified as documentation/schema/test tooling only.
 
 ## Current implementation packages
 
@@ -134,6 +135,7 @@ packages/vs1a/src/pdf-intake-packetization-governance.test.ts
 packages/vs1a/src/codex-task-builder-governance.test.ts
 packages/vs1a/src/pr-review-merge-gate-governance.test.ts
 packages/vs1a/src/continuity-restart-snapshot-governance.test.ts
+packages/vs1a/src/source-artifact-register-qa-governance.test.ts
 ```
 
 Key VS1B files:
@@ -170,14 +172,17 @@ docs/skills/pdf-intake-packetization.md
 docs/skills/codex-task-builder.md
 docs/skills/pr-review-merge-gate.md
 docs/skills/continuity-restart-snapshot.md
+docs/skills/source-artifact-register-qa.md
 schemas/skills/pdf-intake-packetization.output.schema.json
 schemas/skills/codex-task-builder.output.schema.json
 schemas/skills/pr-review-merge-gate.output.schema.json
 schemas/skills/continuity-restart-snapshot.output.schema.json
+schemas/skills/source-artifact-register-qa.output.schema.json
 tests/fixtures/pdf-intake-packetization/
 tests/fixtures/codex-task-builder/
 tests/fixtures/pr-review-merge-gate/
 tests/fixtures/continuity-restart-snapshot/
+tests/fixtures/source-artifact-register-qa/
 .github/workflows/ci.yml
 ```
 
@@ -201,6 +206,12 @@ The Continuity / Restart Snapshot Skill governance can produce compact, provisio
 
 It creates no runtime external-write automation, Airtable write automation, merge/checkpoint/verified authority, current-state update authority, PDF intelligence, real job data, quantities, takeoff records, exports, costs, labor/equipment records, production-rate records, vendor-pricing records, estimating logic changes, or external transmission behavior.
 
+### Source Artifact Register QA Skill governance
+
+The Source Artifact Register QA Skill governance can review source artifact register entries for completeness, traceability, source-of-truth alignment, storage reference hygiene, project-instance isolation, manual-confirmation needs, and premature downstream-use risk. It defines conservative outcomes for register readiness, missing identity, missing storage reference, traceability gaps, project-instance mismatch, source-origin violation, real job data leakage, premature downstream use, manual confirmation, and not-applicable artifacts.
+
+It treats Google Drive as source-file storage rather than governance proof, ClickUp as execution tracking only, and register QA readiness as separate from downstream processing authorization. It creates no runtime external-write automation, source artifact records, Airtable write automation, merge/checkpoint/verified authority, current-state update authority, PDF parsing/intelligence, real job data, quantities, TakeoffItems, summaries, exports, costs, labor/equipment records, production-rate records, vendor-pricing records, quote normalization, AGTEK/earthwork production logic, estimating logic changes, or external transmission behavior.
+
 ## Current guardrails
 
 - Chat history is not the system of record.
@@ -215,10 +226,11 @@ It creates no runtime external-write automation, Airtable write automation, merg
 - Sanitary sewer extraction candidate builder outputs are provisional module records only.
 - Sanitary sewer audit adapter outputs remain provisional audit inputs only and must not bypass human review.
 - Skill governance artifacts are documentation/schema/test tooling only.
-- Skill outputs must remain provisional, review-gated, and must not grant verification, Airtable checkpoint, direct merge, current-state authority, production automation, or external-write authority.
+- Skill outputs must remain provisional, review-gated, and must not grant verification, Airtable checkpoint, direct merge, current-state authority, production automation, external-write authority, source artifact creation, or downstream processing authorization.
 - Audit outputs must remain provisional and human-review gated until explicitly resolved by future governance.
 - Audit promotion gate outputs are not quantity-export-ready.
 - Promoted audit candidates must still pass takeoff review before quantity summary or export.
+- Source artifact register QA readiness is not PDF intelligence authorization, quantity extraction authorization, quote normalization authorization, cost registry authorization, AGTEK/earthwork production authorization, or external transmission authorization.
 - Cost scenarios may consume only approved quantity exports and validated cost input registries.
 - Placeholder production rates may exist in tests but must be blocked from estimate output.
 - Production rates must be registered, versioned, traceable, reviewed, tied to crew/equipment, and validated before cost output.
@@ -247,10 +259,12 @@ docs/skills/pdf-intake-packetization.md
 docs/skills/codex-task-builder.md
 docs/skills/pr-review-merge-gate.md
 docs/skills/continuity-restart-snapshot.md
+docs/skills/source-artifact-register-qa.md
 schemas/skills/pdf-intake-packetization.output.schema.json
 schemas/skills/codex-task-builder.output.schema.json
 schemas/skills/pr-review-merge-gate.output.schema.json
 schemas/skills/continuity-restart-snapshot.output.schema.json
+schemas/skills/source-artifact-register-qa.output.schema.json
 ```
 
 The VS1B vendor quote intake and vendor quote registry review gate modules are verified and exposed through the VS1B root package barrel export:
@@ -317,10 +331,10 @@ Goal: add a controlled synthetic fixture/test that proves the sanitary sewer mod
 Next optional skill lane after implementation work resumes:
 
 ```text
-Source Artifact Register QA Skill
+Sanitary Sewer Review Assistant Skill
 ```
 
-Goal: add governed documentation/schema/test support for reviewing source artifact register completeness, traceability, storage references, source-document isolation, and manual-confirmation flags without creating quantities, costs, or production PDF intelligence.
+Goal: add governed documentation/schema/test support for reviewing sanitary sewer candidate/audit/handoff outputs for completeness, traceability, ambiguity, manual-confirmation needs, and no-bypass constraints without creating quantities, costs, or autonomous takeoff approval.
 
 ## New session boot instruction
 
@@ -331,7 +345,7 @@ This is a V4 Civil Estimating Platform session.
 Use GitHub `djscroggs1970/V4-Repository`, Airtable `V4 Base`, Drive `V4 Framework`, and ClickUp `V4 Framework` as the external sources of truth.
 Read `AGENTS.md`, `docs/continuity/source-of-truth.md`, `docs/continuity/current-state.md`, and `docs/governance/production-rate-source-policy.md` before continuing.
 Codex is available as a controlled implementation assistant, but this chat remains task controller/reviewer and Codex must follow AGENTS.md.
-Current verified version: `v0.1-continuity-restart-snapshot-skill-governance-ci-pass`.
+Current verified version: `v0.1-source-artifact-register-qa-skill-governance-ci-pass`.
 Current goal: [one sentence].
 Do not rely on prior job data unless explicitly provided.
 Maintain job-instance isolation and no-bleed/no-drift rules.
