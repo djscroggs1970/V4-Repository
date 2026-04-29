@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://v4-framework.local/schemas/skills/source-artifact-register-qa.output.schema.json",
+  "title": "V4 Source Artifact Register QA Skill Output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "skill_name",
+    "review_mode",
+    "overall_outcome",
+    "confidence",
+    "provisional_status",
+    "review_gated",
+    "source_of_truth_summary",
+    "batch_context",
+    "artifact_reviews",
+    "manual_confirmation_required",
+    "manual_confirmation_reasons",
+    "blocked_reasons",
+    "required_actions",
+    "downstream_gate",
+    "handoff_note",
+    "trace_refs"
+  ],
+  "properties": {
+    "skill_name": { "const": "V4 Source Artifact Register QA Skill" },
+    "review_mode": { "type": "string", "enum": ["single_artifact", "batch_register_review", "downstream_gate_review", "fixture_review"] },
+    "overall_outcome": { "$ref": "#/$defs/outcome" },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "provisional_status": { "const": "provisional_review_only" },
+    "review_gated": { "const": true },
+    "source_of_truth_summary": { "$ref": "#/$defs/source_of_truth_summary" },
+    "batch_context": { "$ref": "#/$defs/batch_context" },
+    "artifact_reviews": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/artifact_review" } },
+    "manual_confirmation_required": { "type": "boolean" },
+    "manual_confirmation_reasons": { "type": "array", "items": { "type": "string" } },
+    "blocked_reasons": { "type": "array", "items": { "type": "string" } },
+    "required_actions": { "type": "array", "items": { "type": "string" } },
+    "downstream_gate": { "$ref": "#/$defs/downstream_gate" },
+    "handoff_note": { "type": "string", "minLength": 1 },
+    "trace_refs": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+  },
+  "$defs": {
+    "outcome": { "type": "string", "enum": ["register_ready", "needs_manual_confirmation", "blocked_missing_identity", "blocked_missing_storage_reference", "blocked_traceability_gap", "blocked_project_instance_mismatch", "blocked_source_origin_violation", "blocked_real_job_data_leak", "blocked_downstream_use", "not_applicable"] },
+    "artifact_type": { "type": "string", "enum": ["plan_pdf", "plan_sheet_index", "vendor_quote", "agtek_export", "earthwork_quote", "photo", "email_attachment", "source_register", "administrative_note", "unknown"] },
+    "source_origin": { "type": "string", "enum": ["project_upload", "google_drive", "vendor_provided", "agtek_export", "email_attachment", "framework_seed", "sandbox_fixture", "clickup_reference", "chat_context", "unknown"] },
+    "data_boundary": { "type": "string", "enum": ["framework", "sandbox", "project", "mixed_unknown"] },
+    "pass_fail_manual": { "type": "string", "enum": ["pass", "fail", "manual_confirmation_required", "not_applicable"] },
+    "source_of_truth_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["github", "airtable", "google_drive", "clickup", "chat_history", "storage_link_alone_is_not_governance_proof", "current_state_alone_is_not_qa_proof"],
+      "properties": {
+        "github": { "const": "code_source_of_truth" },
+        "airtable": { "const": "checkpoint_governance_source_of_truth" },
+        "google_drive": { "const": "storage_source_of_truth" },
+        "clickup": { "const": "execution_tracking_only" },
+        "chat_history": { "const": "not_system_of_record" },
+        "storage_link_alone_is_not_governance_proof": { "const": true },
+        "current_state_alone_is_not_qa_proof": { "const": true }
+      }
+    },
+    "batch_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["batch_id", "expected_project_instance_id", "review_scope", "requested_downstream_use"],
+      "properties": {
+        "batch_id": { "type": "string" },
+        "expected_project_instance_id": { "type": "string" },
+        "review_scope": { "type": "string" },
+        "requested_downstream_use": { "type": "string" }
+      }
+    },
+    "artifact_review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_artifact_id", "source_document_id", "source_file_id", "project_instance_id", "artifact_type", "file_name", "file_extension", "mime_type", "source_origin", "storage_system", "storage_path_or_uri", "data_boundary", "outcome", "confidence", "identity_status", "storage_reference_status", "traceability_status", "source_origin_status", "project_instance_status", "data_boundary_status", "revision_status", "downstream_use_status", "missing_fields", "invalid_fields", "manual_confirmation_required", "manual_confirmation_reasons", "guardrail_findings", "trace_refs"],
+      "properties": {
+        "source_artifact_id": { "type": "string" },
+        "source_document_id": { "type": "string" },
+        "source_file_id": { "type": "string" },
+        "project_instance_id": { "type": "string" },
+        "artifact_type": { "$ref": "#/$defs/artifact_type" },
+        "file_name": { "type": "string" },
+        "file_extension": { "type": "string" },
+        "mime_type": { "type": "string" },
+        "source_origin": { "$ref": "#/$defs/source_origin" },
+        "storage_system": { "type": "string" },
+        "storage_path_or_uri": { "type": "string" },
+        "data_boundary": { "$ref": "#/$defs/data_boundary" },
+        "outcome": { "$ref": "#/$defs/outcome" },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "identity_status": { "$ref": "#/$defs/pass_fail_manual" },
+        "storage_reference_status": { "$ref": "#/$defs/pass_fail_manual" },
+        "traceability_status": { "$ref": "#/$defs/pass_fail_manual" },
+        "source_origin_status": { "$ref": "#/$defs/pass_fail_manual" },
+        "project_instance_status": { "$ref": "#/$defs/pass_fail_manual" },
+        "data_boundary_status": { "$ref": "#/$defs/pass_fail_manual" },
+        "revision_status": { "$ref": "#/$defs/pass_fail_manual" },
+        "downstream_use_status": { "$ref": "#/$defs/pass_fail_manual" },
+        "missing_fields": { "type": "array", "items": { "type": "string" } },
+        "invalid_fields": { "type": "array", "items": { "type": "string" } },
+        "manual_confirmation_required": { "type": "boolean" },
+        "manual_confirmation_reasons": { "type": "array", "items": { "type": "string" } },
+        "guardrail_findings": { "type": "array", "items": { "type": "string" } },
+        "trace_refs": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "downstream_gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allowed", "allowed_use", "blocked_use_categories"],
+      "properties": {
+        "allowed": { "type": "boolean" },
+        "allowed_use": { "type": "string", "enum": ["register_qa_handoff_only", "none"] },
+        "blocked_use_categories": { "type": "array", "items": { "type": "string", "enum": ["pdf_intelligence", "quantity_extraction", "takeoffitem_creation", "quote_normalization", "cost_registry_merge", "agtek_earthwork_production_logic", "external_transmission", "bid_output"] } }
+      }
+    }
+  }
+}
