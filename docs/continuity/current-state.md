@@ -1,8 +1,8 @@
 # V4 Current State
 
 Status: active restart snapshot  
-Last updated: 2026-04-28  
-Current verified version: `v0.1-source-artifact-register-qa-skill-governance-ci-pass`
+Last updated: 2026-04-29  
+Current verified version: `v0.1-sanitary-sewer-review-assistant-skill-governance-ci-pass`
 
 ## Purpose
 
@@ -22,21 +22,21 @@ Chat is the command lane only. GitHub, Airtable, Drive, and ClickUp hold durable
 
 ## Latest verified checkpoint
 
-`v0.1-source-artifact-register-qa-skill-governance-ci-pass`
+`v0.1-sanitary-sewer-review-assistant-skill-governance-ci-pass`
 
 Evidence:
 
 ```text
-PR: #31 Add source artifact register QA skill governance
-GitHub Actions CI run: 25087404299
+PR: #33 Add sanitary sewer review assistant skill governance
+GitHub Actions CI run: 25121080049
 CI conclusion: success
-Merge SHA: b3741c2185add61b049a26ef4db7221f82794ab3
-Airtable checkpoint record: recADXh7FaGyPQar7
+Merge SHA: 21658648fc09478a61fe365e9a5ccdc45a1587d1
+Airtable checkpoint record: recu3bD8WQWD7skRq
 ```
 
 ## Latest continuity update
 
-This document update records the PR #31 checkpoint. Previous continuity PR #30 recorded the PR #29 checkpoint and merged with SHA `3baa0e464e5143e555e1040789e7468ffa3b2f73`.
+This document update records the PR #33 checkpoint. Previous continuity PR #32 recorded the PR #31 checkpoint and merged with SHA `026d016960e39d07d06c4a77fd71185f57040102`.
 
 ## Current verified VS1A chain
 
@@ -106,6 +106,7 @@ V4 includes a controlled Codex command lane and governed skill support.
 11. PR Review / Merge Gate Skill governance is verified as documentation/schema/test tooling only.
 12. Continuity / Restart Snapshot Skill governance is verified as documentation/schema/test tooling only.
 13. Source Artifact Register QA Skill governance is verified as documentation/schema/test tooling only.
+14. Sanitary Sewer Review Assistant Skill governance is verified as documentation/schema/test tooling only.
 
 ## Current implementation packages
 
@@ -136,6 +137,7 @@ packages/vs1a/src/codex-task-builder-governance.test.ts
 packages/vs1a/src/pr-review-merge-gate-governance.test.ts
 packages/vs1a/src/continuity-restart-snapshot-governance.test.ts
 packages/vs1a/src/source-artifact-register-qa-governance.test.ts
+packages/vs1a/src/sanitary-sewer-review-assistant-governance.test.ts
 ```
 
 Key VS1B files:
@@ -173,16 +175,19 @@ docs/skills/codex-task-builder.md
 docs/skills/pr-review-merge-gate.md
 docs/skills/continuity-restart-snapshot.md
 docs/skills/source-artifact-register-qa.md
+docs/skills/sanitary-sewer-review-assistant.md
 schemas/skills/pdf-intake-packetization.output.schema.json
 schemas/skills/codex-task-builder.output.schema.json
 schemas/skills/pr-review-merge-gate.output.schema.json
 schemas/skills/continuity-restart-snapshot.output.schema.json
 schemas/skills/source-artifact-register-qa.output.schema.json
+schemas/skills/sanitary-sewer-review-assistant.output.schema.json
 tests/fixtures/pdf-intake-packetization/
 tests/fixtures/codex-task-builder/
 tests/fixtures/pr-review-merge-gate/
 tests/fixtures/continuity-restart-snapshot/
 tests/fixtures/source-artifact-register-qa/
+tests/fixtures/sanitary-sewer-review-assistant/
 .github/workflows/ci.yml
 ```
 
@@ -212,6 +217,12 @@ The Source Artifact Register QA Skill governance can review source artifact regi
 
 It treats Google Drive as source-file storage rather than governance proof, ClickUp as execution tracking only, and register QA readiness as separate from downstream processing authorization. It creates no runtime external-write automation, source artifact records, Airtable write automation, merge/checkpoint/verified authority, current-state update authority, PDF parsing/intelligence, real job data, quantities, TakeoffItems, summaries, exports, costs, labor/equipment records, production-rate records, vendor-pricing records, quote normalization, AGTEK/earthwork production logic, estimating logic changes, or external transmission behavior.
 
+### Sanitary Sewer Review Assistant Skill governance
+
+The Sanitary Sewer Review Assistant Skill governance can review sanitary sewer candidate, audit, adapter, promotion-gate, and handoff outputs for completeness, traceability, ambiguity, no-bypass constraints, manual-confirmation needs, and downstream guardrails. It is sanitary-sewer-specific and must not be generalized into storm, water, grading, earthwork, paving, erosion control, landscape, or other scopes.
+
+It creates no runtime external-write automation, Airtable write automation, merge/checkpoint/verified authority, current-state update authority, production sanitary extraction logic, PDF parsing/intelligence, real job data, quantity extraction, TakeoffItems, summaries, exports, costs, labor/equipment records, production-rate records, vendor-pricing records, quote normalization, AGTEK/earthwork production logic, estimating logic changes, other-scope generalization, or external transmission behavior.
+
 ## Current guardrails
 
 - Chat history is not the system of record.
@@ -225,6 +236,7 @@ It treats Google Drive as source-file storage rather than governance proof, Clic
 - Civil extraction candidate outputs must remain module-scoped, human-review gated, and not quantity-export-ready.
 - Sanitary sewer extraction candidate builder outputs are provisional module records only.
 - Sanitary sewer audit adapter outputs remain provisional audit inputs only and must not bypass human review.
+- Sanitary sewer review assistant outputs are provisional review aids only and must not approve quantity exports, create TakeoffItems, create costs/rates, or generalize beyond sanitary sewer.
 - Skill governance artifacts are documentation/schema/test tooling only.
 - Skill outputs must remain provisional, review-gated, and must not grant verification, Airtable checkpoint, direct merge, current-state authority, production automation, external-write authority, source artifact creation, or downstream processing authorization.
 - Audit outputs must remain provisional and human-review gated until explicitly resolved by future governance.
@@ -260,11 +272,13 @@ docs/skills/codex-task-builder.md
 docs/skills/pr-review-merge-gate.md
 docs/skills/continuity-restart-snapshot.md
 docs/skills/source-artifact-register-qa.md
+docs/skills/sanitary-sewer-review-assistant.md
 schemas/skills/pdf-intake-packetization.output.schema.json
 schemas/skills/codex-task-builder.output.schema.json
 schemas/skills/pr-review-merge-gate.output.schema.json
 schemas/skills/continuity-restart-snapshot.output.schema.json
 schemas/skills/source-artifact-register-qa.output.schema.json
+schemas/skills/sanitary-sewer-review-assistant.output.schema.json
 ```
 
 The VS1B vendor quote intake and vendor quote registry review gate modules are verified and exposed through the VS1B root package barrel export:
@@ -331,10 +345,10 @@ Goal: add a controlled synthetic fixture/test that proves the sanitary sewer mod
 Next optional skill lane after implementation work resumes:
 
 ```text
-Sanitary Sewer Review Assistant Skill
+AGTEK / Earthwork Intake Skill
 ```
 
-Goal: add governed documentation/schema/test support for reviewing sanitary sewer candidate/audit/handoff outputs for completeness, traceability, ambiguity, manual-confirmation needs, and no-bypass constraints without creating quantities, costs, or autonomous takeoff approval.
+Goal: add governed documentation/schema/test support for AGTEK/earthwork artifact intake QA, source reference completeness, traceability, isolation, and downstream-use gating without running earthwork production logic, calculating quantities, creating costs, or treating AGTEK files as automatically verified estimate inputs.
 
 ## New session boot instruction
 
@@ -345,7 +359,7 @@ This is a V4 Civil Estimating Platform session.
 Use GitHub `djscroggs1970/V4-Repository`, Airtable `V4 Base`, Drive `V4 Framework`, and ClickUp `V4 Framework` as the external sources of truth.
 Read `AGENTS.md`, `docs/continuity/source-of-truth.md`, `docs/continuity/current-state.md`, and `docs/governance/production-rate-source-policy.md` before continuing.
 Codex is available as a controlled implementation assistant, but this chat remains task controller/reviewer and Codex must follow AGENTS.md.
-Current verified version: `v0.1-source-artifact-register-qa-skill-governance-ci-pass`.
+Current verified version: `v0.1-sanitary-sewer-review-assistant-skill-governance-ci-pass`.
 Current goal: [one sentence].
 Do not rely on prior job data unless explicitly provided.
 Maintain job-instance isolation and no-bleed/no-drift rules.
