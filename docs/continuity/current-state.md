@@ -2,7 +2,7 @@
 
 Status: active restart snapshot  
 Last updated: 2026-04-29  
-Current verified version: `v0.1-sanitary-sewer-review-assistant-skill-governance-ci-pass`
+Current verified version: `v0.1-agtek-earthwork-intake-skill-governance-ci-pass`
 
 ## Purpose
 
@@ -22,21 +22,21 @@ Chat is the command lane only. GitHub, Airtable, Drive, and ClickUp hold durable
 
 ## Latest verified checkpoint
 
-`v0.1-sanitary-sewer-review-assistant-skill-governance-ci-pass`
+`v0.1-agtek-earthwork-intake-skill-governance-ci-pass`
 
 Evidence:
 
 ```text
-PR: #33 Add sanitary sewer review assistant skill governance
-GitHub Actions CI run: 25121080049
+PR: #35 Add AGTEK earthwork intake skill governance
+GitHub Actions CI run: 25123972181
 CI conclusion: success
-Merge SHA: 21658648fc09478a61fe365e9a5ccdc45a1587d1
-Airtable checkpoint record: recu3bD8WQWD7skRq
+Merge SHA: 68937363b1903fbdc440c69a885a480ff35cd6bd
+Airtable checkpoint record: recdp2AnlnN0E0F1H
 ```
 
 ## Latest continuity update
 
-This document update records the PR #33 checkpoint. Previous continuity PR #32 recorded the PR #31 checkpoint and merged with SHA `026d016960e39d07d06c4a77fd71185f57040102`.
+This document update records the PR #35 checkpoint. Previous continuity PR #34 recorded the PR #33 checkpoint and merged with SHA `fe2380561ac7e240496207f64d0721c38d734e0f`.
 
 ## Current verified VS1A chain
 
@@ -107,6 +107,7 @@ V4 includes a controlled Codex command lane and governed skill support.
 12. Continuity / Restart Snapshot Skill governance is verified as documentation/schema/test tooling only.
 13. Source Artifact Register QA Skill governance is verified as documentation/schema/test tooling only.
 14. Sanitary Sewer Review Assistant Skill governance is verified as documentation/schema/test tooling only.
+15. AGTEK / Earthwork Intake Skill governance is verified as documentation/schema/test tooling only.
 
 ## Current implementation packages
 
@@ -138,6 +139,7 @@ packages/vs1a/src/pr-review-merge-gate-governance.test.ts
 packages/vs1a/src/continuity-restart-snapshot-governance.test.ts
 packages/vs1a/src/source-artifact-register-qa-governance.test.ts
 packages/vs1a/src/sanitary-sewer-review-assistant-governance.test.ts
+packages/vs1a/src/agtek-earthwork-intake-governance.test.ts
 ```
 
 Key VS1B files:
@@ -176,18 +178,21 @@ docs/skills/pr-review-merge-gate.md
 docs/skills/continuity-restart-snapshot.md
 docs/skills/source-artifact-register-qa.md
 docs/skills/sanitary-sewer-review-assistant.md
+docs/skills/agtek-earthwork-intake.md
 schemas/skills/pdf-intake-packetization.output.schema.json
 schemas/skills/codex-task-builder.output.schema.json
 schemas/skills/pr-review-merge-gate.output.schema.json
 schemas/skills/continuity-restart-snapshot.output.schema.json
 schemas/skills/source-artifact-register-qa.output.schema.json
 schemas/skills/sanitary-sewer-review-assistant.output.schema.json
+schemas/skills/agtek-earthwork-intake.output.schema.json
 tests/fixtures/pdf-intake-packetization/
 tests/fixtures/codex-task-builder/
 tests/fixtures/pr-review-merge-gate/
 tests/fixtures/continuity-restart-snapshot/
 tests/fixtures/source-artifact-register-qa/
 tests/fixtures/sanitary-sewer-review-assistant/
+tests/fixtures/agtek-earthwork-intake/
 .github/workflows/ci.yml
 ```
 
@@ -223,6 +228,12 @@ The Sanitary Sewer Review Assistant Skill governance can review sanitary sewer c
 
 It creates no runtime external-write automation, Airtable write automation, merge/checkpoint/verified authority, current-state update authority, production sanitary extraction logic, PDF parsing/intelligence, real job data, quantity extraction, TakeoffItems, summaries, exports, costs, labor/equipment records, production-rate records, vendor-pricing records, quote normalization, AGTEK/earthwork production logic, estimating logic changes, other-scope generalization, or external transmission behavior.
 
+### AGTEK / Earthwork Intake Skill governance
+
+The AGTEK / Earthwork Intake Skill governance can review AGTEK and earthwork source artifacts at the intake-QA level for artifact identity, storage references, traceability, source-of-truth alignment, project-instance isolation, file metadata, manual-confirmation needs, and premature downstream-use risk.
+
+It is intake QA only. It creates no runtime external-write automation, Airtable write automation, merge/checkpoint/verified authority, current-state update authority, AGTEK production parsing, earthwork production logic, surface interpretation, cut/fill/import/export/borrow/waste quantity calculations, PDF parsing/intelligence, real job data, quantity extraction, TakeoffItems, summaries, exports, estimate packages, costs, labor/equipment records, production-rate records, vendor-pricing records, quote normalization, estimating logic changes, or external transmission behavior.
+
 ## Current guardrails
 
 - Chat history is not the system of record.
@@ -237,6 +248,7 @@ It creates no runtime external-write automation, Airtable write automation, merg
 - Sanitary sewer extraction candidate builder outputs are provisional module records only.
 - Sanitary sewer audit adapter outputs remain provisional audit inputs only and must not bypass human review.
 - Sanitary sewer review assistant outputs are provisional review aids only and must not approve quantity exports, create TakeoffItems, create costs/rates, or generalize beyond sanitary sewer.
+- AGTEK / earthwork intake outputs are provisional intake-QA aids only and must not run earthwork production logic, interpret surfaces, calculate cut/fill/import/export/borrow/waste quantities, create costs/rates, or treat AGTEK artifacts as automatically verified estimate inputs.
 - Skill governance artifacts are documentation/schema/test tooling only.
 - Skill outputs must remain provisional, review-gated, and must not grant verification, Airtable checkpoint, direct merge, current-state authority, production automation, external-write authority, source artifact creation, or downstream processing authorization.
 - Audit outputs must remain provisional and human-review gated until explicitly resolved by future governance.
@@ -273,12 +285,14 @@ docs/skills/pr-review-merge-gate.md
 docs/skills/continuity-restart-snapshot.md
 docs/skills/source-artifact-register-qa.md
 docs/skills/sanitary-sewer-review-assistant.md
+docs/skills/agtek-earthwork-intake.md
 schemas/skills/pdf-intake-packetization.output.schema.json
 schemas/skills/codex-task-builder.output.schema.json
 schemas/skills/pr-review-merge-gate.output.schema.json
 schemas/skills/continuity-restart-snapshot.output.schema.json
 schemas/skills/source-artifact-register-qa.output.schema.json
 schemas/skills/sanitary-sewer-review-assistant.output.schema.json
+schemas/skills/agtek-earthwork-intake.output.schema.json
 ```
 
 The VS1B vendor quote intake and vendor quote registry review gate modules are verified and exposed through the VS1B root package barrel export:
@@ -345,10 +359,10 @@ Goal: add a controlled synthetic fixture/test that proves the sanitary sewer mod
 Next optional skill lane after implementation work resumes:
 
 ```text
-AGTEK / Earthwork Intake Skill
+Production Rate Source Review Skill
 ```
 
-Goal: add governed documentation/schema/test support for AGTEK/earthwork artifact intake QA, source reference completeness, traceability, isolation, and downstream-use gating without running earthwork production logic, calculating quantities, creating costs, or treating AGTEK files as automatically verified estimate inputs.
+Goal: add governed documentation/schema/test support for reviewing production-rate source evidence, source hierarchy, traceability, versioning, crew/equipment context, manual-confirmation needs, and placeholder-rate blocking without creating production rates, cost records, or estimating output.
 
 ## New session boot instruction
 
@@ -359,7 +373,7 @@ This is a V4 Civil Estimating Platform session.
 Use GitHub `djscroggs1970/V4-Repository`, Airtable `V4 Base`, Drive `V4 Framework`, and ClickUp `V4 Framework` as the external sources of truth.
 Read `AGENTS.md`, `docs/continuity/source-of-truth.md`, `docs/continuity/current-state.md`, and `docs/governance/production-rate-source-policy.md` before continuing.
 Codex is available as a controlled implementation assistant, but this chat remains task controller/reviewer and Codex must follow AGENTS.md.
-Current verified version: `v0.1-sanitary-sewer-review-assistant-skill-governance-ci-pass`.
+Current verified version: `v0.1-agtek-earthwork-intake-skill-governance-ci-pass`.
 Current goal: [one sentence].
 Do not rely on prior job data unless explicitly provided.
 Maintain job-instance isolation and no-bleed/no-drift rules.
